@@ -102,18 +102,24 @@ function generateRandomProperties() {
       purchaseSignal = "🔴 Eher nicht";
     }
 
-    let houseMoneyStatus = "🟡 normal";
-    if (houseMoney < 220) houseMoneyStatus = "🟢 niedrig";
-    if (houseMoney > 330) houseMoneyStatus = "🔴 hoch";
+    let houseMoneyStatus = "🟡 Mittel";
+    if (houseMoney < 220) houseMoneyStatus = "🟢 Niedrig";
+    if (houseMoney > 330) houseMoneyStatus = "🔴 Hoch";
 
-    let reservesStatus = "🟡 mittel";
-    if (reserves > 70000) reservesStatus = "🟢 gut";
-    if (reserves < 40000) reservesStatus = "🔴 niedrig";
+    let distanceStatus = "🟡 Akzeptabel";
+    if (distance < 10) distanceStatus = "🟢 Sehr gut";
+    if (distance > 25) distanceStatus = "🔴 Weit entfernt";
+
+    let marketText = "kein Vorteil erkennbar";
+    if (marketDiff < 0) marketText = `🟢 ${marketAdvantage}% unter Marktpreis`;
+    if (marketDiff > 0) marketText = `🔴 ${marketDiff}% über Marktpreis`;
 
     properties.push({
+      id: i,
       title: `Objekt ${i}`,
       location: locations[Math.floor(Math.random() * locations.length)],
       distance,
+      distanceStatus,
       seller: sellers[Math.floor(Math.random() * sellers.length)],
       image: images[Math.floor(Math.random() * images.length)],
       price,
@@ -122,11 +128,11 @@ function generateRandomProperties() {
       houseMoney,
       houseMoneyStatus,
       reserves,
-      reservesStatus,
       pricePerSqm,
       marketPricePerSqm,
       marketDiff,
       marketAdvantage,
+      marketText,
       score,
       status,
       color,
@@ -152,6 +158,14 @@ function generateRandomProperties() {
 
   properties.sort((a, b) => b.score - a.score);
   return properties;
+}
+
+function toggleFavorite(button) {
+  if (button.innerText.includes("gespeichert")) {
+    button.innerText = "⭐ Zu Favoriten hinzufügen";
+  } else {
+    button.innerText = "⭐ Favorit gespeichert";
+  }
 }
 
 function searchProperties() {
@@ -198,31 +212,34 @@ function searchProperties() {
         <p><strong>${property.score}/100 Punkte</strong> ${property.status}</p>
         <p><strong>${topDeal}</strong> ${favorite}</p>
 
+        <button class="favorite-btn" onclick="toggleFavorite(this)">⭐ Zu Favoriten hinzufügen</button>
+
         <hr>
 
         <p><strong>Preis:</strong> ${property.price.toLocaleString()} €</p>
         <p><strong>Wohnfläche:</strong> ${property.area} m²</p>
         <p><strong>Preis/m²:</strong> ${property.pricePerSqm.toLocaleString()} €/m²</p>
-        <p><strong>Marktvorteil:</strong> ${property.marketAdvantage > 0 ? property.marketAdvantage + "% günstiger" : "kein Vorteil erkennbar"}</p>
+        <p><strong>Marktvergleich:</strong> ${property.marketText}</p>
+
+        <p><strong>Entfernung:</strong> ca. ${property.distance} km ${property.distanceStatus}</p>
+        <p><strong>Baujahr:</strong> ${property.year}</p>
+        <p><strong>Hausgeld:</strong> ${property.houseMoney} € / Monat ${property.houseMoneyStatus}</p>
+        <p><strong>Rücklagen WEG:</strong> ${property.reserves.toLocaleString()} €</p>
+
+        <hr>
 
         <p><strong>Deal-Score:</strong> ${property.dealScore}</p>
         <p><strong>Kaufsignal:</strong> ${property.purchaseSignal}</p>
         <p><strong>Kaufempfehlung:</strong> ${property.recommendation}</p>
 
         <details>
-          <summary>Objektdetails</summary>
-          <br>
-          Entfernung: ca. ${property.distance} km<br>
-          Baujahr: ${property.year}<br>
-          Hausgeld: ${property.houseMoney} € / Monat ${property.houseMoneyStatus}<br>
-          Rücklagen: ${property.reservesStatus} (${property.reserves.toLocaleString()} €)
-        </details>
-
-        <details>
-          <summary>Kaufkosten</summary>
+          <summary>Kaufnebenkosten</summary>
           <br>
           Kaufpreis: ${property.price.toLocaleString()} €<br>
-          Nebenkosten geschätzt: ${(property.totalCosts - property.price).toLocaleString()} €<br>
+          Grunderwerbsteuer: ${property.tax.toLocaleString()} €<br>
+          Notar: ${property.notary.toLocaleString()} €<br>
+          Grundbuch: ${property.landRegister.toLocaleString()} €<br>
+          Makler geschätzt: ${property.broker.toLocaleString()} €<br><br>
           Gesamtkosten: <strong>${property.totalCosts.toLocaleString()} €</strong><br>
           Eigenkapital: ${property.equity.toLocaleString()} €<br>
           Finanzierungsbetrag: <strong>${property.loanAmount.toLocaleString()} €</strong>
@@ -239,19 +256,21 @@ function searchProperties() {
         </details>
 
         <details>
+          <summary>Anbieter & Kontakt</summary>
+          <br>
+          Anbieter: ${property.seller}<br>
+          Telefon: ${property.phone}<br>
+          E-Mail: ${property.email}<br>
+          Website: <a href="${property.website}" target="_blank">Anbieter öffnen</a><br>
+          <a href="${property.link}" target="_blank">🔗 Exposé öffnen</a>
+        </details>
+
+        <details>
           <summary>Rechtlicher Hinweis</summary>
           <br>
           ⚠️ Automatisierte Orientierungshilfe. Keine Finanzierungsberatung, Rechtsberatung,
           technische Prüfung oder professionelle Wertermittlung. Alle Angaben ohne Gewähr.
         </details>
-
-        <hr>
-
-        <p><strong>Anbieter:</strong> ${property.seller}</p>
-        <p><strong>Telefon:</strong> ${property.phone}</p>
-        <p><strong>E-Mail:</strong> ${property.email}</p>
-        <p><strong>Website:</strong> <a href="${property.website}" target="_blank">Anbieter öffnen</a></p>
-        <p><a href="${property.link}" target="_blank">🔗 Exposé öffnen</a></p>
       </div>
     `;
   });
