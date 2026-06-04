@@ -21,7 +21,9 @@ button{background:#2563eb;color:white;font-weight:bold;border:none;cursor:pointe
 .red{border-left:8px solid #ef4444}
 summary{cursor:pointer;font-weight:bold;font-size:18px}
 .favorite-btn{background:#facc15;color:#111;margin-top:10px}
+.export-btn{background:#16a34a;margin-top:15px}
 .badge{font-weight:bold}
+.small{font-size:14px;color:#555}
 @media(max-width:700px){
 body{padding:16px}
 .mode-buttons{grid-template-columns:1fr}
@@ -112,6 +114,21 @@ body{padding:16px}
 🟡 60–79 Punkte = Prüfen<br>
 🔴 0–59 Punkte = Eher nicht<br><br>
 L = Lage | P = Preis | Z = Zustand | E = Energie | H = Hausgeld | D = Dokumentation | R = Rücklagen
+</details>
+
+<details>
+<summary>⭐ Meine Favoriten</summary>
+<div id="favoritesList" class="small">
+Noch keine Favoriten gespeichert.
+</div>
+<button class="export-btn" onclick="exportFavorites()">📄 Favoriten als CSV exportieren</button>
+</details>
+
+<details>
+<summary>📅 Suchhistorie</summary>
+<div id="historyList" class="small">
+Noch keine Suchläufe vorhanden.
+</div>
 </details>
 
 <div id="results"></div>
