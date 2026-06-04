@@ -1,13 +1,11 @@
 function generateRandomProperties() {
   const locations = [
-    "München-Schwabing",
-    "München-Giesing",
-    "München-Ost",
-    "München-Pasing",
-    "Haar bei München",
-    "Unterhaching",
-    "München-Sendling",
-    "München-Ramersdorf"
+    "81739 München-Ramersdorf",
+    "81539 München-Giesing",
+    "80804 München-Schwabing",
+    "85540 Haar bei München",
+    "81373 München-Sendling",
+    "81241 München-Pasing"
   ];
 
   const sellers = [
@@ -28,11 +26,37 @@ function generateRandomProperties() {
   const properties = [];
 
   for (let i = 1; i <= 10; i++) {
-    const price = Math.floor(Math.random() * 140000) + 120000;
-    const area = Math.floor(Math.random() * 55) + 35;
+    const price = Math.floor(Math.random() * 180000) + 120000;
+    const area = Math.floor(Math.random() * 60) + 35;
     const year = Math.floor(Math.random() * 45) + 1978;
+    const houseMoney = Math.floor(Math.random() * 300) + 120;
+    const reserves = Math.floor(Math.random() * 90000) + 20000;
+    const distance = (Math.random() * 25 + 1).toFixed(1);
+
     const pricePerSqm = Math.round(price / area);
-    const score = Math.floor(Math.random() * 51) + 50;
+    const marketPricePerSqm = 4500;
+    const marketDiff = Math.round(((pricePerSqm - marketPricePerSqm) / marketPricePerSqm) * 100);
+
+    let score = 50;
+
+    if (pricePerSqm < 3800) score += 25;
+    else if (pricePerSqm < 4500) score += 18;
+    else if (pricePerSqm < 5200) score += 10;
+    else score += 3;
+
+    if (houseMoney < 220) score += 15;
+    else if (houseMoney < 330) score += 8;
+    else score += 2;
+
+    if (year > 2000) score += 10;
+    else if (year > 1990) score += 6;
+    else score += 3;
+
+    if (reserves > 70000) score += 10;
+    else if (reserves > 40000) score += 6;
+    else score += 2;
+
+    score = Math.min(score, 100);
 
     let status = "🟡 Prüfen";
     let color = "yellow";
@@ -53,6 +77,10 @@ function generateRandomProperties() {
       dealScore = "🔴 Zu teuer oder kritisch";
     }
 
+    let houseMoneyStatus = "🟡 normal";
+    if (houseMoney < 220) houseMoneyStatus = "🟢 niedrig";
+    if (houseMoney > 330) houseMoneyStatus = "🔴 hoch";
+
     const loanAmount = price;
     const interestRate = 0.035;
     const repaymentRate = 0.01;
@@ -61,12 +89,18 @@ function generateRandomProperties() {
     properties.push({
       title: `Objekt ${i}`,
       location: locations[Math.floor(Math.random() * locations.length)],
+      distance,
       seller: sellers[Math.floor(Math.random() * sellers.length)],
       image: images[Math.floor(Math.random() * images.length)],
       price,
       area,
       year,
+      houseMoney,
+      houseMoneyStatus,
+      reserves,
       pricePerSqm,
+      marketPricePerSqm,
+      marketDiff,
       score,
       status,
       color,
@@ -123,19 +157,29 @@ function searchProperties() {
         <h3>${property.title}</h3>
 
         <p><strong>📍 Standort:</strong> ${property.location}</p>
-        <p><strong>${property.score}/100 Punkte</strong> ${property.status}</p>
+        <p><strong>Entfernung:</strong> ca. ${property.distance} km</p>
 
+        <p><strong>${property.score}/100 Punkte</strong> ${property.status}</p>
         <p><strong>${topDeal}</strong> ${favorite}</p>
+
+        <hr>
 
         <p><strong>Preis:</strong> ${property.price.toLocaleString()} €</p>
         <p><strong>Wohnfläche:</strong> ${property.area} m²</p>
         <p><strong>Preis/m²:</strong> ${property.pricePerSqm.toLocaleString()} €/m²</p>
+        <p><strong>Marktpreis/m²:</strong> ca. ${property.marketPricePerSqm.toLocaleString()} €/m²</p>
+        <p><strong>Marktabweichung:</strong> ${property.marketDiff}%</p>
         <p><strong>Baujahr:</strong> ${property.year}</p>
 
         <hr>
 
+        <p><strong>Hausgeld:</strong> ${property.houseMoney} € / Monat ${property.houseMoneyStatus}</p>
+        <p><strong>Rücklagen WEG:</strong> ca. ${property.reserves.toLocaleString()} €</p>
+
+        <hr>
+
         <p><strong>Deal-Score:</strong> ${property.dealScore}</p>
-        <p><strong>Empfehlung:</strong> ${property.recommendation}</p>
+        <p><strong>Kaufempfehlung:</strong> ${property.recommendation}</p>
 
         <div class="box">
           <strong>Finanzierungsbeispiel</strong><br><br>
