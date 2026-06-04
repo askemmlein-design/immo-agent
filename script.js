@@ -37,18 +37,26 @@ function generateRandomProperties() {
     let status = "🟡 Prüfen";
     let color = "yellow";
     let recommendation = "Interessant, aber Unterlagen und Zustand genauer prüfen.";
+    let dealScore = "🟡 Marktüblich";
 
     if (score >= 80) {
       status = "🟢 Interessant";
       color = "green";
       recommendation = "Besichtigung empfohlen. Objekt wirkt auf Basis der Angaben interessant.";
+      dealScore = "🟢 Sehr attraktiv";
     }
 
     if (score < 60) {
       status = "🔴 Eher nicht";
       color = "red";
       recommendation = "Eher nicht priorisieren. Nur bei besonderem Interesse weiter prüfen.";
+      dealScore = "🔴 Zu teuer oder kritisch";
     }
+
+    const loanAmount = price;
+    const interestRate = 0.035;
+    const repaymentRate = 0.01;
+    const monthlyRate = Math.round((loanAmount * (interestRate + repaymentRate)) / 12);
 
     properties.push({
       title: `Objekt ${i}`,
@@ -66,7 +74,9 @@ function generateRandomProperties() {
       email: "kontakt@muster-immo.de",
       website: "https://www.immobilienscout24.de",
       link: "https://www.immobilienscout24.de",
-      recommendation
+      recommendation,
+      dealScore,
+      monthlyRate
     });
   }
 
@@ -124,13 +134,23 @@ function searchProperties() {
 
         <hr>
 
+        <p><strong>Deal-Score:</strong> ${property.dealScore}</p>
         <p><strong>Empfehlung:</strong> ${property.recommendation}</p>
 
         <div class="box">
+          <strong>Finanzierungsbeispiel</strong><br><br>
+          Kaufpreis: ${property.price.toLocaleString()} €<br>
+          Eigenkapital: 0 €<br>
+          Zins: 3,5 %<br>
+          Tilgung: 1,0 %<br>
+          Geschätzte Monatsrate: ca. ${property.monthlyRate.toLocaleString()} €
+        </div>
+
+        <div class="box">
           ⚠️ <strong>Hinweis ohne Gewähr:</strong><br>
-          Diese Bewertung ist eine automatisierte Orientierungshilfe. Sie ersetzt keine Besichtigung,
-          keine technische Prüfung, keine Finanzierungsberatung, keine Rechtsberatung und keine
-          professionelle Wertermittlung. Alle Angaben ohne Gewähr.
+          Diese Bewertung und das Finanzierungsbeispiel sind automatisierte Orientierungshilfen.
+          Sie ersetzen keine Besichtigung, keine technische Prüfung, keine Finanzierungsberatung,
+          keine Rechtsberatung und keine professionelle Wertermittlung. Alle Angaben ohne Gewähr.
         </div>
 
         <hr>
