@@ -1,70 +1,76 @@
 function generateRandomProperties() {
+  const properties = [];
 
-const properties = [];
+  for (let i = 1; i <= 10; i++) {
+    const score = Math.floor(Math.random() * 41) + 60;
 
-for(let i = 1; i <= 10; i++) {
+    let status = "🟡 Prüfen";
+    let color = "yellow";
 
-const score = Math.floor(Math.random() * 41) + 60;
+    if (score >= 80) {
+      status = "🟢 Interessant";
+      color = "green";
+    }
 
-let status = "🟡 Prüfen";
-let color = "yellow";
+    if (score < 60) {
+      status = "🔴 Eher nicht";
+      color = "red";
+    }
 
-if(score >= 80){
-status = "🟢 Interessant";
-color = "green";
+    properties.push({
+      title: `Objekt ${i}`,
+      price: Math.floor(Math.random() * 100000) + 100000,
+      area: Math.floor(Math.random() * 50) + 40,
+      year: Math.floor(Math.random() * 30) + 1990,
+      score: score,
+      status: status,
+      color: color,
+
+      seller: "Muster Immobilien GmbH",
+      phone: "089 / 123456",
+      email: "kontakt@muster-immo.de",
+      link: "https://www.immobilienscout24.de"
+    });
+  }
+
+  properties.sort((a, b) => b.score - a.score);
+
+  return properties;
 }
 
-if(score < 60){
-status = "🔴 Eher nicht";
-color = "red";
-}
+function searchProperties() {
+  const results = document.getElementById("results");
+  const properties = generateRandomProperties();
 
-properties.push({
-title: `Objekt ${i}`,
-price: Math.floor(Math.random() * 100000) + 100000,
-area: Math.floor(Math.random() * 50) + 40,
-year: Math.floor(Math.random() * 30) + 1990,
-score: score,
-status: status,
-color: color
-});
+  let html = "<h2>Gefundene Immobilien</h2>";
 
-}
+  properties.forEach((property, index) => {
+    html += `
+      <div class="result ${property.color}">
+        <h3>🏆 Platz ${index + 1}</h3>
 
-properties.sort((a,b)=>b.score-a.score);
+        <h3>${property.title}</h3>
 
-return properties;
-}
+        <p><strong>${property.score}/100 Punkte</strong> ${property.status}</p>
 
-function searchProperties(){
+        <p><strong>Preis:</strong> ${property.price.toLocaleString()} €</p>
+        <p><strong>Wohnfläche:</strong> ${property.area} m²</p>
+        <p><strong>Baujahr:</strong> ${property.year}</p>
 
-const results = document.getElementById("results");
+        <hr>
 
-const properties = generateRandomProperties();
+        <p><strong>Anbieter:</strong> ${property.seller}</p>
+        <p><strong>Telefon:</strong> ${property.phone}</p>
+        <p><strong>E-Mail:</strong> ${property.email}</p>
 
-let html = "<h2>Gefundene Immobilien</h2>";
+        <p>
+          <a href="${property.link}" target="_blank">
+            🔗 Exposé öffnen
+          </a>
+        </p>
+      </div>
+    `;
+  });
 
-properties.forEach((p,index)=>{
-
-html += `
-<div class="result ${p.color}">
-<h3>🏆 Platz ${index+1}</h3>
-
-<h3>${p.title}</h3>
-
-<p><strong>${p.score}/100 Punkte</strong> ${p.status}</p>
-
-<p>Preis: ${p.price.toLocaleString()} €</p>
-
-<p>Wohnfläche: ${p.area} m²</p>
-
-<p>Baujahr: ${p.year}</p>
-
-</div>
-`;
-
-});
-
-results.innerHTML = html;
-
+  results.innerHTML = html;
 }
