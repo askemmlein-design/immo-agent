@@ -4,9 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ImmoAgent Alpha</title>
+
 <style>
 body{font-family:Arial,sans-serif;background:#f4f6f8;margin:0;padding:30px}
-.container{max-width:900px;margin:auto}
+.container{max-width:950px;margin:auto}
 .card{background:white;padding:25px;border-radius:16px;box-shadow:0 2px 14px rgba(0,0,0,.12)}
 input,select,textarea,button{width:100%;padding:12px;margin:8px 0 18px;border-radius:8px;border:1px solid #ddd}
 button{background:#2563eb;color:white;font-weight:bold;border:none;cursor:pointer}
@@ -14,9 +15,13 @@ button{background:#2563eb;color:white;font-weight:bold;border:none;cursor:pointe
 .mode-buttons button{background:#e5e7eb;color:#111}
 .mode-buttons button.active{background:#2563eb;color:white}
 .box{background:#eef2f7;padding:15px;border-radius:12px;margin-top:15px}
-.result{margin-top:20px;padding:18px;border-radius:12px;background:#eef6ff;border-left:8px solid #22c55e}
-.yellow{border-left-color:#facc15}
-.red{border-left-color:#ef4444}
+.result{margin-top:18px;padding:18px;border-radius:12px;background:#eef6ff}
+.green{border-left:8px solid #22c55e}
+.yellow{border-left:8px solid #facc15}
+.red{border-left:8px solid #ef4444}
+.rank{font-size:22px;font-weight:bold}
+.meta{color:#555;font-size:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .small{font-size:14px;color:#666}
 </style>
 </head>
@@ -40,7 +45,7 @@ button{background:#2563eb;color:white;font-weight:bold;border:none;cursor:pointe
 <h3>Automatische Suche</h3>
 
 <label>Objektart</label>
-<select>
+<select id="type">
 <option>Wohnung Kauf</option>
 <option>Wohnung Miete</option>
 <option>Haus Kauf</option>
@@ -50,10 +55,10 @@ button{background:#2563eb;color:white;font-weight:bold;border:none;cursor:pointe
 </select>
 
 <label>Maximalpreis (€)</label>
-<input type="number" value="200000">
+<input id="maxPrice" type="number" value="200000">
 
 <label>Suchradius (km)</label>
-<input type="number" value="25">
+<input id="radius" type="number" value="25">
 
 <button onclick="showAutoResults()">Automatisch suchen & bewerten</button>
 </div>
@@ -98,66 +103,118 @@ document.getElementById(mode+"Btn").classList.add("active");
 document.getElementById("results").innerHTML="";
 }
 
+function card(rank,title,score,status,css,price,area,year,codes,why){
+return `
+<div class="result ${css}">
+<div class="rank">${rank}</div>
+<h3>${title}</h3>
+<h2>${score}/100 Punkte ${status}</h2>
+
+<div class="grid">
+<p><strong>Preis:</strong> ${price}</p>
+<p><strong>Wohnfläche:</strong> ${area}</p>
+<p><strong>Baujahr:</strong> ${year}</p>
+<p><strong>Kürzel:</strong> ${codes}</p>
+</div>
+
+<hr>
+
+<strong>Warum?</strong>
+<ul>${why}</ul>
+
+<p class="small">Demo-Ranking. Später werden hier echte Treffer aus Immobilienquellen bewertet.</p>
+</div>
+`;
+}
+
 function showAutoResults(){
 document.getElementById("results").innerHTML=`
-<div class="result">
-<h3>Wohnung München-Schwabing</h3>
-<h2>86/100 Punkte 🟢</h2>
-<p><strong>Status:</strong> Interessant</p>
-<p><strong>Kürzel:</strong> L+ | P+ | Z+ | E+ | H- | D+</p>
-<hr>
-<strong>Punkteübersicht</strong>
-<ul>
-<li>Lage: 20/20</li>
-<li>Preis: 18/20</li>
-<li>Zustand: 14/15</li>
-<li>Energie: 12/15</li>
-<li>Hausgeld: 7/10</li>
-<li>Dokumentation: 15/20</li>
-</ul>
-<strong>Warum?</strong>
-<ul>
-<li>Sehr gute Lage</li>
-<li>Preis wirkt marktgerecht</li>
-<li>Guter Zustand</li>
-<li>Energieangaben positiv</li>
-<li>Hausgeld prüfen</li>
-</ul>
-<p class="small">Hinweis: Aktuell Demo-Daten. Im nächsten Schritt wird echte Datenverarbeitung ergänzt.</p>
-</div>
+<h3>Gefundene Immobilien: 5</h3>
+<p class="meta">Sortiert nach Bewertung – beste Treffer zuerst.</p>
 
-<div class="result yellow">
-<h3>Wohnung München-Ost</h3>
-<h2>71/100 Punkte 🟡</h2>
-<p><strong>Status:</strong> Prüfen</p>
-<p><strong>Kürzel:</strong> L+ | P- | Z+ | E? | D-</p>
-</div>
+${card(
+"🥇 Platz 1",
+"Wohnung München-Schwabing",
+86,
+"🟢 Interessant",
+"green",
+"198.000 €",
+"48 m²",
+"2008",
+"L+ | P+ | Z+ | E+ | H- | D+",
+"<li>Sehr gute Lage</li><li>Preis im Zielbereich</li><li>Guter Zustand</li><li>Dokumentation ordentlich</li>"
+)}
 
-<div class="result red">
-<h3>Wohnung München-Randlage</h3>
-<h2>48/100 Punkte 🔴</h2>
-<p><strong>Status:</strong> Eher nicht</p>
-<p><strong>Kürzel:</strong> L- | P- | Z- | E-</p>
-</div>
+${card(
+"🥈 Platz 2",
+"Wohnung München-Giesing",
+78,
+"🟡 Prüfen",
+"yellow",
+"189.000 €",
+"42 m²",
+"1995",
+"L+ | P+ | Z± | E? | H-",
+"<li>Gute Lage</li><li>Preis interessant</li><li>Zustand prüfen</li><li>Hausgeld auffällig</li>"
+)}
+
+${card(
+"🥉 Platz 3",
+"Wohnung München-Ost",
+71,
+"🟡 Prüfen",
+"yellow",
+"205.000 €",
+"51 m²",
+"1988",
+"L+ | P- | Z+ | E? | D-",
+"<li>Lage grundsätzlich interessant</li><li>Preis leicht über Vorgabe</li><li>Exposé unvollständig</li>"
+)}
+
+${card(
+"Platz 4",
+"Wohnung Haar",
+63,
+"🟡 Prüfen",
+"yellow",
+"175.000 €",
+"39 m²",
+"1975",
+"L± | P+ | Z- | E-",
+"<li>Preis gut</li><li>Lage außerhalb Kerngebiet</li><li>Sanierungsrisiko möglich</li>"
+)}
+
+${card(
+"Platz 5",
+"Wohnung München-Randlage",
+48,
+"🔴 Eher nicht",
+"red",
+"220.000 €",
+"40 m²",
+"1968",
+"L- | P- | Z- | E-",
+"<li>Preis zu hoch</li><li>Schwächere Lage</li><li>Energie und Zustand kritisch</li>"
+)}
 `;
 }
 
 function showLinkResults(){
 document.getElementById("results").innerHTML=`
 <div class="result yellow">
-<h3>Link-Auswertung</h3>
-<h2>Stufe 2 vorbereitet 🟡</h2>
-<p>Hier werden später mehrere ImmoScout-Links automatisch ausgelesen und bewertet.</p>
+<h3>🔗 Link-Auswertung vorbereitet</h3>
+<h2>Stufe 2 🟡</h2>
+<p>Hier werden später mehrere Immobilien-Links automatisch gelesen, bewertet und als Ranking ausgegeben.</p>
 </div>
 `;
 }
 
 function showTextResult(){
 document.getElementById("results").innerHTML=`
-<div class="result">
-<h3>Exposé-Auswertung</h3>
-<h2>Stufe 1 vorbereitet 🟢</h2>
-<p>Hier wird später ein eingefügter Exposé-Text automatisch analysiert.</p>
+<div class="result green">
+<h3>📄 Exposé-Auswertung vorbereitet</h3>
+<h2>Stufe 1 🟢</h2>
+<p>Hier wird später ein eingefügter Exposé-Text analysiert und automatisch bewertet.</p>
 </div>
 `;
 }
