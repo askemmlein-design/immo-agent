@@ -27,6 +27,7 @@ function generateRandomProperties() {
   const repayment1 = Number(document.getElementById("repayment1").value) / 100;
   const interest2 = Number(document.getElementById("interest2").value) / 100;
   const repayment2 = Number(document.getElementById("repayment2").value) / 100;
+  const equity = Number(document.getElementById("equity").value || 0);
 
   const properties = [];
 
@@ -41,6 +42,18 @@ function generateRandomProperties() {
     const pricePerSqm = Math.round(price / area);
     const marketPricePerSqm = 4500;
     const marketDiff = Math.round(((pricePerSqm - marketPricePerSqm) / marketPricePerSqm) * 100);
+    const marketAdvantage = marketDiff < 0 ? Math.abs(marketDiff) : 0;
+
+    const notary = Math.round(price * 0.02);
+    const tax = Math.round(price * 0.035);
+    const landRegister = Math.round(price * 0.005);
+    const broker = Math.round(price * 0.0357);
+    const totalCosts = price + notary + tax + landRegister + broker;
+    const loanAmount = Math.max(totalCosts - equity, 0);
+
+    const monthlyRate1 = Math.round((loanAmount * (interest1 + repayment1)) / 12);
+    const monthlyRate2 = Math.round((loanAmount * (interest2 + repayment2)) / 12);
+    const monthlyDifference = monthlyRate2 - monthlyRate1;
 
     let score = 50;
 
@@ -66,28 +79,36 @@ function generateRandomProperties() {
     let status = "🟡 Prüfen";
     let color = "yellow";
     let recommendation = "Interessant, aber Unterlagen und Zustand genauer prüfen.";
-    let dealScore = "🟡 Marktüblich";
+    let dealScore = "🟡 Marktgerecht";
+    let purchaseSignal = "🟡 Prüfen";
 
-    if (score >= 80) {
+    if (score >= 90) {
+      status = "⭐ Sofort ansehen";
+      color = "green";
+      recommendation = "Sehr starkes Objekt. Zeitnah ansehen und Unterlagen anfordern.";
+      dealScore = "🟢 Sehr attraktiv";
+      purchaseSignal = "⭐ Sofort ansehen";
+    } else if (score >= 80) {
       status = "🟢 Interessant";
       color = "green";
       recommendation = "Besichtigung empfohlen. Objekt wirkt auf Basis der Angaben interessant.";
-      dealScore = "🟢 Sehr attraktiv";
-    }
-
-    if (score < 60) {
+      dealScore = "🟢 Attraktiv";
+      purchaseSignal = "🟢 Besichtigung empfohlen";
+    } else if (score < 60) {
       status = "🔴 Eher nicht";
       color = "red";
       recommendation = "Eher nicht priorisieren. Nur bei besonderem Interesse weiter prüfen.";
       dealScore = "🔴 Zu teuer oder kritisch";
+      purchaseSignal = "🔴 Eher nicht";
     }
 
     let houseMoneyStatus = "🟡 normal";
     if (houseMoney < 220) houseMoneyStatus = "🟢 niedrig";
     if (houseMoney > 330) houseMoneyStatus = "🔴 hoch";
 
-    const monthlyRate1 = Math.round((price * (interest1 + repayment1)) / 12);
-    const monthlyRate2 = Math.round((price * (interest2 + repayment2)) / 12);
+    let reservesStatus = "🟡 mittel";
+    if (reserves > 70000) reservesStatus = "🟢 gut";
+    if (reserves < 40000) reservesStatus = "🔴 niedrig";
 
     properties.push({
       title: `Objekt ${i}`,
@@ -101,24 +122,31 @@ function generateRandomProperties() {
       houseMoney,
       houseMoneyStatus,
       reserves,
+      reservesStatus,
       pricePerSqm,
       marketPricePerSqm,
       marketDiff,
+      marketAdvantage,
       score,
       status,
       color,
+      notary,
+      tax,
+      landRegister,
+      broker,
+      totalCosts,
+      equity,
+      loanAmount,
       phone: "089 / 123456",
       email: "kontakt@muster-immo.de",
       website: "https://www.immobilienscout24.de",
       link: "https://www.immobilienscout24.de",
       recommendation,
       dealScore,
+      purchaseSignal,
       monthlyRate1,
       monthlyRate2,
-      interest1,
-      repayment1,
-      interest2,
-      repayment2
+      monthlyDifference
     });
   }
 
@@ -130,7 +158,8 @@ function searchProperties() {
   const results = document.getElementById("results");
   const properties = generateRandomProperties();
 
-  const greenCount = properties.filter(p => p.score >= 80).length;
+  const starCount = properties.filter(p => p.score >= 90).length;
+  const greenCount = properties.filter(p => p.score >= 80 && p.score < 90).length;
   const yellowCount = properties.filter(p => p.score >= 60 && p.score < 80).length;
   const redCount = properties.filter(p => p.score < 60).length;
   const bestScore = properties[0].score;
@@ -147,7 +176,8 @@ function searchProperties() {
     <div class="box">
       <strong>Suchlauf:</strong> ${now}<br><br>
       <strong>Gesamt:</strong> ${properties.length} Immobilien<br>
-      🟢 Interessant: ${greenCount}<br>
+      ⭐ Sofort ansehen: ${starCount}<br>
+      🟢 Besichtigung empfohlen: ${greenCount}<br>
       🟡 Prüfen: ${yellowCount}<br>
       🔴 Eher nicht: ${redCount}<br><br>
       <strong>Bester Treffer:</strong> ${bestScore}/100 Punkte
@@ -160,18 +190,13 @@ function searchProperties() {
 
     html += `
       <div class="result ${property.color}">
-        <img 
-          src="${property.image}" 
-          alt="${property.title}" 
-          style="width:100%;height:260px;object-fit:cover;border-radius:12px;margin-bottom:15px;"
-        >
+        <img src="${property.image}" alt="${property.title}" style="width:100%;height:260px;object-fit:cover;border-radius:12px;margin-bottom:15px;">
 
         <h3>🏆 Platz ${index + 1}</h3>
         <h3>${property.title}</h3>
 
         <p><strong>📍 Standort:</strong> ${property.location}</p>
         <p><strong>Entfernung:</strong> ca. ${property.distance} km</p>
-
         <p><strong>${property.score}/100 Punkte</strong> ${property.status}</p>
         <p><strong>${topDeal}</strong> ${favorite}</p>
 
@@ -180,43 +205,42 @@ function searchProperties() {
         <p><strong>Preis:</strong> ${property.price.toLocaleString()} €</p>
         <p><strong>Wohnfläche:</strong> ${property.area} m²</p>
         <p><strong>Preis/m²:</strong> ${property.pricePerSqm.toLocaleString()} €/m²</p>
-        <p><strong>Marktpreis/m²:</strong> ca. ${property.marketPricePerSqm.toLocaleString()} €/m²</p>
-        <p><strong>Marktabweichung:</strong> ${property.marketDiff}%</p>
+        <p><strong>Marktvorteil:</strong> ${property.marketAdvantage > 0 ? property.marketAdvantage + "% günstiger" : "kein Vorteil erkennbar"}</p>
         <p><strong>Baujahr:</strong> ${property.year}</p>
 
         <hr>
 
         <p><strong>Hausgeld:</strong> ${property.houseMoney} € / Monat ${property.houseMoneyStatus}</p>
-        <p><strong>Rücklagen WEG:</strong> ca. ${property.reserves.toLocaleString()} €</p>
+        <p><strong>Rücklagen:</strong> ${property.reservesStatus} (${property.reserves.toLocaleString()} €)</p>
 
         <hr>
 
+        <p><strong>Kaufsignal:</strong> ${property.purchaseSignal}</p>
         <p><strong>Deal-Score:</strong> ${property.dealScore}</p>
         <p><strong>Kaufempfehlung:</strong> ${property.recommendation}</p>
 
         <div class="box">
-          <strong>Finanzierungsbeispiel 1</strong><br><br>
+          <strong>Kaufkosten kompakt</strong><br><br>
           Kaufpreis: ${property.price.toLocaleString()} €<br>
-          Eigenkapital: 0 €<br>
-          Zins: ${interest1Value} %<br>
-          Tilgung: ${repayment1Value} %<br>
-          Geschätzte Monatsrate: ca. ${property.monthlyRate1.toLocaleString()} €
+          Nebenkosten geschätzt: ${(property.totalCosts - property.price).toLocaleString()} €<br>
+          Gesamtkosten: <strong>${property.totalCosts.toLocaleString()} €</strong><br>
+          Eigenkapital: ${property.equity.toLocaleString()} €<br>
+          Finanzierungsbetrag: <strong>${property.loanAmount.toLocaleString()} €</strong>
         </div>
 
         <div class="box">
-          <strong>Finanzierungsbeispiel 2</strong><br><br>
-          Kaufpreis: ${property.price.toLocaleString()} €<br>
-          Eigenkapital: 0 €<br>
-          Zins: ${interest2Value} %<br>
-          Tilgung: ${repayment2Value} %<br>
-          Geschätzte Monatsrate: ca. ${property.monthlyRate2.toLocaleString()} €
+          <strong>Finanzierung</strong><br><br>
+          Beispiel 1: ${interest1Value}% Zins + ${repayment1Value}% Tilgung<br>
+          Monatsrate: ca. <strong>${property.monthlyRate1.toLocaleString()} €</strong><br><br>
+          Beispiel 2: ${interest2Value}% Zins + ${repayment2Value}% Tilgung<br>
+          Monatsrate: ca. <strong>${property.monthlyRate2.toLocaleString()} €</strong><br><br>
+          Differenz: <strong>+${property.monthlyDifference.toLocaleString()} € / Monat</strong>
         </div>
 
         <div class="box">
           ⚠️ <strong>Hinweis ohne Gewähr:</strong><br>
-          Diese Bewertung und die Finanzierungsbeispiele sind automatisierte Orientierungshilfen.
-          Sie ersetzen keine Besichtigung, keine technische Prüfung, keine Finanzierungsberatung,
-          keine Rechtsberatung und keine professionelle Wertermittlung. Alle Angaben ohne Gewähr.
+          Automatisierte Orientierungshilfe. Keine Finanzierungsberatung, Rechtsberatung,
+          technische Prüfung oder professionelle Wertermittlung. Alle Angaben ohne Gewähr.
         </div>
 
         <hr>
@@ -225,12 +249,7 @@ function searchProperties() {
         <p><strong>Telefon:</strong> ${property.phone}</p>
         <p><strong>E-Mail:</strong> ${property.email}</p>
         <p><strong>Website:</strong> <a href="${property.website}" target="_blank">Anbieter öffnen</a></p>
-
-        <p>
-          <a href="${property.link}" target="_blank">
-            🔗 Exposé öffnen
-          </a>
-        </p>
+        <p><a href="${property.link}" target="_blank">🔗 Exposé öffnen</a></p>
       </div>
     `;
   });
