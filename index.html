@@ -19,6 +19,24 @@ button{background:#2563eb;color:white;font-weight:bold;border:none;cursor:pointe
 .green{border-left:8px solid #22c55e}
 .yellow{border-left:8px solid #facc15}
 .red{border-left:8px solid #ef4444}
+
+details{
+  background:#eef2f7;
+  padding:15px;
+  border-radius:12px;
+  margin-top:15px;
+}
+
+summary{
+  cursor:pointer;
+  font-weight:bold;
+  font-size:18px;
+}
+
+@media(max-width:700px){
+  body{padding:16px}
+  .mode-buttons{grid-template-columns:1fr}
+}
 </style>
 </head>
 
@@ -38,7 +56,9 @@ button{background:#2563eb;color:white;font-weight:bold;border:none;cursor:pointe
 </div>
 
 <div id="autoMode">
-<h3>Automatische Suche</h3>
+
+<details open>
+<summary>🔍 Suchkriterien</summary>
 
 <label>Objektart</label>
 <select id="type">
@@ -55,8 +75,10 @@ button{background:#2563eb;color:white;font-weight:bold;border:none;cursor:pointe
 
 <label>Suchradius (km)</label>
 <input id="radius" type="number" value="25">
+</details>
 
-<h3>Finanzierung</h3>
+<details>
+<summary>💶 Finanzierung einstellen</summary>
 
 <label>Eigenkapital (€)</label>
 <input id="equity" type="number" value="0">
@@ -72,30 +94,36 @@ button{background:#2563eb;color:white;font-weight:bold;border:none;cursor:pointe
 
 <label>Tilgung Beispiel 2 (%)</label>
 <input id="repayment2" type="number" step="0.1" value="1.0">
+</details>
 
 <button onclick="searchProperties()">Automatisch suchen & bewerten</button>
 </div>
 
 <div id="linksMode" style="display:none">
-<h3>Mehrere Links bewerten</h3>
+<details open>
+<summary>🔗 Mehrere Links bewerten</summary>
 <textarea rows="7" placeholder="Hier mehrere ImmoScout-Links einfügen, je Link eine Zeile"></textarea>
 <button>Links auswerten</button>
+</details>
 </div>
 
 <div id="textMode" style="display:none">
-<h3>Exposé oder Text bewerten</h3>
+<details open>
+<summary>📄 Exposé oder Text bewerten</summary>
 <textarea rows="10" placeholder="Hier Exposé-Text einfügen"></textarea>
 <button>Text bewerten</button>
+</details>
 </div>
 
-<div class="box">
-<strong>Bewertungslogik</strong><br><br>
+<details>
+<summary>📊 Bewertungslogik anzeigen</summary>
+<br>
 ⭐ 90–100 Punkte = Sofort ansehen<br>
 🟢 80–89 Punkte = Besichtigung empfohlen<br>
 🟡 60–79 Punkte = Prüfen<br>
 🔴 0–59 Punkte = Eher nicht<br><br>
 L = Lage | P = Preis | Z = Zustand | E = Energie | H = Hausgeld | D = Dokumentation | R = Rücklagen
-</div>
+</details>
 
 <div id="results"></div>
 
