@@ -4,23 +4,82 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ImmoAgent</title>
+
 <style>
-body{font-family:Arial,sans-serif;background:#f5f7fa;margin:0;padding:40px}
-.container{max-width:850px;margin:auto}
-.card{background:white;border-radius:16px;padding:28px;box-shadow:0 2px 14px rgba(0,0,0,.12)}
-input,select,button{width:100%;padding:13px;margin-top:8px;margin-bottom:18px;border-radius:9px;border:1px solid #ddd}
-button{background:#2563eb;color:white;font-size:16px;border:none;cursor:pointer}
-.result{margin-top:18px;padding:18px;border-radius:12px;background:#eef6ff}
-.green{border-left:8px solid #22c55e}
-.yellow{border-left:8px solid #facc15}
-.red{border-left:8px solid #ef4444}
-.legend{font-weight:bold}
-.small{color:#666;font-size:14px}
+body{
+    font-family: Arial, sans-serif;
+    background:#f5f7fa;
+    margin:0;
+    padding:40px;
+}
+
+.container{
+    max-width:850px;
+    margin:auto;
+}
+
+.card{
+    background:white;
+    border-radius:16px;
+    padding:28px;
+    box-shadow:0 2px 14px rgba(0,0,0,.12);
+}
+
+input,select,button{
+    width:100%;
+    padding:13px;
+    margin-top:8px;
+    margin-bottom:18px;
+    border-radius:9px;
+    border:1px solid #ddd;
+}
+
+button{
+    background:#2563eb;
+    color:white;
+    font-size:16px;
+    border:none;
+    cursor:pointer;
+}
+
+.result{
+    margin-top:18px;
+    padding:18px;
+    border-radius:12px;
+    background:#eef6ff;
+}
+
+.green{border-left:8px solid #22c55e;}
+.yellow{border-left:8px solid #facc15;}
+.red{border-left:8px solid #ef4444;}
+
+.legend-box{
+    margin-top:25px;
+    padding:16px;
+    background:#f1f5f9;
+    border-radius:12px;
+    font-size:14px;
+}
+
+.reason{
+    margin-top:12px;
+    padding:12px;
+    background:white;
+    border-radius:10px;
+}
+
+.small{
+    color:#666;
+    font-size:14px;
+}
 </style>
 </head>
+
 <body>
+
 <div class="container">
 <div class="card">
+
 <h1>🏡 ImmoAgent Alpha</h1>
 <p>Immobilien bewerten statt nur suchen.</p>
 
@@ -42,39 +101,86 @@ button{background:#2563eb;color:white;font-size:16px;border:none;cursor:pointer}
 
 <button onclick="startSearch()">Suche starten</button>
 
+<div class="legend-box">
+<strong>Legende</strong><br><br>
+🟢 8–10 Punkte = Interessant<br>
+🟡 5–7 Punkte = Prüfen<br>
+🔴 0–4 Punkte = Eher nicht<br><br>
+
+<strong>Kürzel</strong><br>
+L = Lage |
+P = Preis |
+Z = Zustand |
+E = Energie |
+H = Hausgeld |
+R = Rücklagen |
+D = Dokumentation
+</div>
+
 <div id="results"></div>
+
 </div>
 </div>
 
 <script>
 function startSearch(){
-const results=document.getElementById("results");
-results.innerHTML=`
+const results = document.getElementById("results");
+
+results.innerHTML = `
 <div class="result green">
 <h3>Wohnung München-Schwabing</h3>
 <p><strong>Bewertung:</strong> 8/10 🟢</p>
-<p class="legend">L+ | P+ | Z+ | E+ | H-</p>
-<p>Interessant – Besichtigung empfohlen</p>
-<p class="small">Gute Lage, attraktiver Preis, guter Zustand. Hausgeld prüfen.</p>
+<p><strong>Kürzel:</strong> L+ | P+ | Z+ | E+ | H-</p>
+<p><strong>Empfehlung:</strong> Interessant – Besichtigung empfohlen</p>
+
+<div class="reason">
+<strong>Warum?</strong>
+<ul>
+<li>Gute Lage mit starker Infrastruktur</li>
+<li>Preis wirkt marktgerecht</li>
+<li>Guter Zustand laut Exposé</li>
+<li>Energieangaben positiv</li>
+<li>Hausgeld sollte geprüft werden</li>
+</ul>
+</div>
 </div>
 
 <div class="result yellow">
 <h3>Wohnung München-Ost</h3>
 <p><strong>Bewertung:</strong> 6/10 🟡</p>
-<p class="legend">L+ | P- | Z- | D-</p>
-<p>Prüfen – Unterlagen und Zustand genauer ansehen</p>
-<p class="small">Lage gut, aber Preis hoch und Exposé unvollständig.</p>
+<p><strong>Kürzel:</strong> L+ | P- | Z- | D-</p>
+<p><strong>Empfehlung:</strong> Prüfen – Unterlagen und Zustand genauer ansehen</p>
+
+<div class="reason">
+<strong>Warum?</strong>
+<ul>
+<li>Lage grundsätzlich interessant</li>
+<li>Preis erscheint etwas hoch</li>
+<li>Zustand unklar oder renovierungsbedürftig</li>
+<li>Exposé wirkt unvollständig</li>
+</ul>
+</div>
 </div>
 
 <div class="result red">
 <h3>Wohnung München-Randlage</h3>
 <p><strong>Bewertung:</strong> 3/10 🔴</p>
-<p class="legend">L- | P- | Z- | E-</p>
-<p>Eher nicht – nur bei besonderem Interesse prüfen</p>
-<p class="small">Schwächere Lage, hoher Preis, Sanierungsbedarf und schlechte Energieangaben.</p>
+<p><strong>Kürzel:</strong> L- | P- | Z- | E-</p>
+<p><strong>Empfehlung:</strong> Eher nicht – nur bei besonderem Interesse prüfen</p>
+
+<div class="reason">
+<strong>Warum?</strong>
+<ul>
+<li>Schwächere Lage</li>
+<li>Preis wirkt zu hoch</li>
+<li>Sanierungsbedarf möglich</li>
+<li>Energieangaben negativ oder unklar</li>
+</ul>
+</div>
 </div>
 `;
 }
 </script>
+
 </body>
 </html>
