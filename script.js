@@ -1,3 +1,24 @@
+function getFavorites() {
+  return JSON.parse(localStorage.getItem("favorites")) || [];
+}
+
+function saveFavorites(favorites) {
+  localStorage.setItem("favorites", JSON.stringify(favorites));
+}
+
+function toggleFavorite(id) {
+  let favorites = getFavorites();
+
+  if (favorites.includes(id)) {
+    favorites = favorites.filter(f => f !== id);
+  } else {
+    favorites.push(id);
+  }
+
+  saveFavorites(favorites);
+  searchProperties();
+}
+
 function generateRandomProperties() {
   const locations = [
     "81739 München-Ramersdorf",
@@ -6,6 +27,19 @@ function generateRandomProperties() {
     "85540 Haar bei München",
     "81373 München-Sendling",
     "81241 München-Pasing"
+  ];
+
+  const titles = [
+    "2-Zimmer Wohnung München-Schwabing",
+    "3-Zimmer Wohnung München-Giesing",
+    "Maisonette Haar bei München",
+    "Dachgeschosswohnung München-Pasing",
+    "Kapitalanlage München-Sendling",
+    "Erdgeschosswohnung München-Ramersdorf",
+    "Familienwohnung München-Schwabing",
+    "Modernisierte Wohnung München-Giesing",
+    "Neubauwohnung München-Pasing",
+    "2-Zimmer Wohnung München-Haidhausen"
   ];
 
   const sellers = [
@@ -116,7 +150,7 @@ function generateRandomProperties() {
 
     properties.push({
       id: i,
-      title: `Objekt ${i}`,
+      title: titles[i - 1],
       location: locations[Math.floor(Math.random() * locations.length)],
       distance,
       distanceStatus,
@@ -129,9 +163,6 @@ function generateRandomProperties() {
       houseMoneyStatus,
       reserves,
       pricePerSqm,
-      marketPricePerSqm,
-      marketDiff,
-      marketAdvantage,
       marketText,
       score,
       status,
@@ -160,17 +191,10 @@ function generateRandomProperties() {
   return properties;
 }
 
-function toggleFavorite(button) {
-  if (button.innerText.includes("gespeichert")) {
-    button.innerText = "⭐ Zu Favoriten hinzufügen";
-  } else {
-    button.innerText = "⭐ Favorit gespeichert";
-  }
-}
-
 function searchProperties() {
   const results = document.getElementById("results");
   const properties = generateRandomProperties();
+  const favorites = getFavorites();
 
   const starCount = properties.filter(p => p.score >= 90).length;
   const greenCount = properties.filter(p => p.score >= 80 && p.score < 90).length;
@@ -193,13 +217,18 @@ function searchProperties() {
       <strong>Suchlauf:</strong> ${now}<br><br>
       <strong>${properties.length} Treffer</strong><br><br>
       ⭐ ${starCount} | 🟢 ${greenCount} | 🟡 ${yellowCount} | 🔴 ${redCount}<br><br>
-      <strong>Bester Treffer:</strong> ${bestScore}/100 Punkte
+      <strong>Bester Treffer:</strong> ${bestScore}/100 Punkte<br>
+      <strong>Gespeicherte Favoriten:</strong> ${favorites.length}
     </details>
   `;
 
   properties.forEach((property, index) => {
-    const topDeal = property.score >= 95 ? "🏆 TOP DEAL" : "";
-    const favorite = property.score >= 85 ? "⭐ Favorit" : "";
+    const isFavorite = favorites.includes(property.id);
+    const topDeal = property.score >= 95
+      ? "<span style='color:#16a34a;font-weight:bold'>🟢 TOP DEAL</span>"
+      : "";
+
+    const favoriteText = isFavorite ? "⭐ Favorit gespeichert" : "☆ Zu Favoriten hinzufügen";
 
     html += `
       <div class="result ${property.color}">
@@ -210,9 +239,9 @@ function searchProperties() {
 
         <p><strong>📍 Standort:</strong> ${property.location}</p>
         <p><strong>${property.score}/100 Punkte</strong> ${property.status}</p>
-        <p><strong>${topDeal}</strong> ${favorite}</p>
+        <p>${topDeal}</p>
 
-        <button class="favorite-btn" onclick="toggleFavorite(this)">⭐ Zu Favoriten hinzufügen</button>
+        <button class="favorite-btn" onclick="toggleFavorite(${property.id})">${favoriteText}</button>
 
         <hr>
 
