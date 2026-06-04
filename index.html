@@ -14,28 +14,15 @@ button{background:#2563eb;color:white;font-weight:bold;border:none;cursor:pointe
 .mode-buttons{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
 .mode-buttons button{background:#e5e7eb;color:#111}
 .mode-buttons button.active{background:#2563eb;color:white}
-.box{background:#eef2f7;padding:15px;border-radius:12px;margin-top:15px}
+.box,details{background:#eef2f7;padding:15px;border-radius:12px;margin-top:15px}
 .result{margin-top:18px;padding:18px;border-radius:12px;background:#eef6ff}
 .green{border-left:8px solid #22c55e}
 .yellow{border-left:8px solid #facc15}
 .red{border-left:8px solid #ef4444}
-
-details{
-  background:#eef2f7;
-  padding:15px;
-  border-radius:12px;
-  margin-top:15px;
-}
-
-summary{
-  cursor:pointer;
-  font-weight:bold;
-  font-size:18px;
-}
-
+summary{cursor:pointer;font-weight:bold;font-size:18px}
 @media(max-width:700px){
-  body{padding:16px}
-  .mode-buttons{grid-template-columns:1fr}
+body{padding:16px}
+.mode-buttons{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -58,7 +45,7 @@ summary{
 <div id="autoMode">
 
 <details open>
-<summary>🔍 Suchkriterien</summary>
+<summary>Suchkriterien</summary>
 
 <label>Objektart</label>
 <select id="type">
@@ -78,7 +65,7 @@ summary{
 </details>
 
 <details>
-<summary>💶 Finanzierung einstellen</summary>
+<summary>Finanzierung</summary>
 
 <label>Eigenkapital (€)</label>
 <input id="equity" type="number" value="0">
@@ -101,7 +88,7 @@ summary{
 
 <div id="linksMode" style="display:none">
 <details open>
-<summary>🔗 Mehrere Links bewerten</summary>
+<summary>Links bewerten</summary>
 <textarea rows="7" placeholder="Hier mehrere ImmoScout-Links einfügen, je Link eine Zeile"></textarea>
 <button>Links auswerten</button>
 </details>
@@ -109,14 +96,14 @@ summary{
 
 <div id="textMode" style="display:none">
 <details open>
-<summary>📄 Exposé oder Text bewerten</summary>
+<summary>Exposé oder Text bewerten</summary>
 <textarea rows="10" placeholder="Hier Exposé-Text einfügen"></textarea>
 <button>Text bewerten</button>
 </details>
 </div>
 
 <details>
-<summary>📊 Bewertungslogik anzeigen</summary>
+<summary>Bewertungslogik</summary>
 <br>
 ⭐ 90–100 Punkte = Sofort ansehen<br>
 🟢 80–89 Punkte = Besichtigung empfohlen<br>
