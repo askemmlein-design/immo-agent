@@ -173,19 +173,18 @@ function searchProperties() {
   let html = `
     <h2>Gefundene Immobilien</h2>
 
-    <div class="box">
+    <details>
+      <summary>Suchstatistik</summary>
+      <br>
       <strong>Suchlauf:</strong> ${now}<br><br>
-      <strong>Gesamt:</strong> ${properties.length} Immobilien<br>
-      ⭐ Sofort ansehen: ${starCount}<br>
-      🟢 Besichtigung empfohlen: ${greenCount}<br>
-      🟡 Prüfen: ${yellowCount}<br>
-      🔴 Eher nicht: ${redCount}<br><br>
+      <strong>${properties.length} Treffer</strong><br><br>
+      ⭐ ${starCount} | 🟢 ${greenCount} | 🟡 ${yellowCount} | 🔴 ${redCount}<br><br>
       <strong>Bester Treffer:</strong> ${bestScore}/100 Punkte
-    </div>
+    </details>
   `;
 
   properties.forEach((property, index) => {
-    const topDeal = property.score >= 95 ? "🏆 Top Deal" : "";
+    const topDeal = property.score >= 95 ? "🏆 TOP DEAL" : "";
     const favorite = property.score >= 85 ? "⭐ Favorit" : "";
 
     html += `
@@ -196,7 +195,6 @@ function searchProperties() {
         <h3>${property.title}</h3>
 
         <p><strong>📍 Standort:</strong> ${property.location}</p>
-        <p><strong>Entfernung:</strong> ca. ${property.distance} km</p>
         <p><strong>${property.score}/100 Punkte</strong> ${property.status}</p>
         <p><strong>${topDeal}</strong> ${favorite}</p>
 
@@ -206,42 +204,46 @@ function searchProperties() {
         <p><strong>Wohnfläche:</strong> ${property.area} m²</p>
         <p><strong>Preis/m²:</strong> ${property.pricePerSqm.toLocaleString()} €/m²</p>
         <p><strong>Marktvorteil:</strong> ${property.marketAdvantage > 0 ? property.marketAdvantage + "% günstiger" : "kein Vorteil erkennbar"}</p>
-        <p><strong>Baujahr:</strong> ${property.year}</p>
 
-        <hr>
-
-        <p><strong>Hausgeld:</strong> ${property.houseMoney} € / Monat ${property.houseMoneyStatus}</p>
-        <p><strong>Rücklagen:</strong> ${property.reservesStatus} (${property.reserves.toLocaleString()} €)</p>
-
-        <hr>
-
-        <p><strong>Kaufsignal:</strong> ${property.purchaseSignal}</p>
         <p><strong>Deal-Score:</strong> ${property.dealScore}</p>
+        <p><strong>Kaufsignal:</strong> ${property.purchaseSignal}</p>
         <p><strong>Kaufempfehlung:</strong> ${property.recommendation}</p>
 
-        <div class="box">
-          <strong>Kaufkosten kompakt</strong><br><br>
+        <details>
+          <summary>Objektdetails</summary>
+          <br>
+          Entfernung: ca. ${property.distance} km<br>
+          Baujahr: ${property.year}<br>
+          Hausgeld: ${property.houseMoney} € / Monat ${property.houseMoneyStatus}<br>
+          Rücklagen: ${property.reservesStatus} (${property.reserves.toLocaleString()} €)
+        </details>
+
+        <details>
+          <summary>Kaufkosten</summary>
+          <br>
           Kaufpreis: ${property.price.toLocaleString()} €<br>
           Nebenkosten geschätzt: ${(property.totalCosts - property.price).toLocaleString()} €<br>
           Gesamtkosten: <strong>${property.totalCosts.toLocaleString()} €</strong><br>
           Eigenkapital: ${property.equity.toLocaleString()} €<br>
           Finanzierungsbetrag: <strong>${property.loanAmount.toLocaleString()} €</strong>
-        </div>
+        </details>
 
-        <div class="box">
-          <strong>Finanzierung</strong><br><br>
+        <details>
+          <summary>Finanzierung</summary>
+          <br>
           Beispiel 1: ${interest1Value}% Zins + ${repayment1Value}% Tilgung<br>
           Monatsrate: ca. <strong>${property.monthlyRate1.toLocaleString()} €</strong><br><br>
           Beispiel 2: ${interest2Value}% Zins + ${repayment2Value}% Tilgung<br>
           Monatsrate: ca. <strong>${property.monthlyRate2.toLocaleString()} €</strong><br><br>
           Differenz: <strong>+${property.monthlyDifference.toLocaleString()} € / Monat</strong>
-        </div>
+        </details>
 
-        <div class="box">
-          ⚠️ <strong>Hinweis ohne Gewähr:</strong><br>
-          Automatisierte Orientierungshilfe. Keine Finanzierungsberatung, Rechtsberatung,
+        <details>
+          <summary>Rechtlicher Hinweis</summary>
+          <br>
+          ⚠️ Automatisierte Orientierungshilfe. Keine Finanzierungsberatung, Rechtsberatung,
           technische Prüfung oder professionelle Wertermittlung. Alle Angaben ohne Gewähr.
-        </div>
+        </details>
 
         <hr>
 
