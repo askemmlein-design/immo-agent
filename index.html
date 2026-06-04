@@ -7,77 +7,70 @@
 
 <style>
 body{
-font-family:Arial,sans-serif;
-background:#f5f7fa;
-padding:40px;
+    font-family: Arial, sans-serif;
+    background:#f5f7fa;
+    margin:0;
+    padding:40px;
 }
 
 .container{
-max-width:900px;
-margin:auto;
+    max-width:850px;
+    margin:auto;
 }
 
 .card{
-background:white;
-padding:25px;
-border-radius:15px;
-box-shadow:0 2px 10px rgba(0,0,0,0.1);
+    background:white;
+    border-radius:16px;
+    padding:28px;
+    box-shadow:0 2px 14px rgba(0,0,0,.12);
 }
 
 input,select,button{
-width:100%;
-padding:12px;
-margin-top:8px;
-margin-bottom:15px;
-border:1px solid #ddd;
-border-radius:8px;
+    width:100%;
+    padding:13px;
+    margin-top:8px;
+    margin-bottom:18px;
+    border-radius:9px;
+    border:1px solid #ddd;
 }
 
 button{
-background:#2563eb;
-color:white;
-font-size:16px;
-cursor:pointer;
-border:none;
+    background:#2563eb;
+    color:white;
+    font-size:16px;
+    border:none;
+    cursor:pointer;
 }
 
 .result{
-margin-top:20px;
-padding:20px;
-border-radius:12px;
-background:#f8fafc;
+    margin-top:18px;
+    padding:18px;
+    border-radius:12px;
+    background:#eef6ff;
 }
 
-.green{
-border-left:8px solid #22c55e;
-}
+.green{border-left:8px solid #22c55e;}
+.yellow{border-left:8px solid #facc15;}
+.red{border-left:8px solid #ef4444;}
 
-.yellow{
-border-left:8px solid #eab308;
-}
-
-.red{
-border-left:8px solid #ef4444;
-}
-
-.score{
-font-size:22px;
-font-weight:bold;
-margin-top:10px;
+.legend-box{
+    margin-top:25px;
+    padding:16px;
+    background:#f1f5f9;
+    border-radius:12px;
+    font-size:14px;
 }
 
 .reason{
-margin-top:15px;
-padding:15px;
-background:white;
-border-radius:10px;
+    margin-top:12px;
+    padding:12px;
+    background:white;
+    border-radius:10px;
 }
 
-.legend{
-margin-top:20px;
-padding:15px;
-background:#eef2ff;
-border-radius:10px;
+.small{
+    color:#666;
+    font-size:14px;
 }
 </style>
 </head>
@@ -88,135 +81,104 @@ border-radius:10px;
 <div class="card">
 
 <h1>🏡 ImmoAgent Alpha</h1>
+<p>Immobilien bewerten statt nur suchen.</p>
 
 <label>Objektart</label>
-<select>
+<select id="type">
 <option>Wohnung Kauf</option>
 <option>Wohnung Miete</option>
 <option>Haus Kauf</option>
 <option>Haus Miete</option>
+<option>Garage Kauf</option>
+<option>Garage Miete</option>
 </select>
 
 <label>Maximalpreis (€)</label>
-<input type="number" value="200000">
+<input id="price" type="number" placeholder="200000">
 
 <label>Suchradius (km)</label>
-<input type="number" value="25">
-<label>Wohnfläche (m²)</label>
-<input type="number" value="70">
+<input id="radius" type="number" placeholder="25">
 
-<label>Baujahr</label>
-<input type="number" value="2000">
+<button onclick="startSearch()">Suche starten</button>
 
-<label>Energieklasse</label>
-<select>
-  <option>A+</option>
-  <option>A</option>
-  <option>B</option>
-  <option>C</option>
-  <option>D</option>
-  <option>E</option>
-  <option>F</option>
-</select>
+<div class="legend-box">
+<strong>Legende</strong><br><br>
+🟢 8–10 Punkte = Interessant<br>
+🟡 5–7 Punkte = Prüfen<br>
+🔴 0–4 Punkte = Eher nicht<br><br>
 
-<label>Hausgeld (€)</label>
-<input type="number" value="250"><button onclick="bewerten()">
-Suche starten
-</button>
-
-<div class="legend">
-<b>Bewertungslogik</b><br><br>
-
-L = Lage<br>
-P = Preis<br>
-Z = Zustand<br>
-E = Energie<br>
-H = Hausgeld<br>
+<strong>Kürzel</strong><br>
+L = Lage |
+P = Preis |
+Z = Zustand |
+E = Energie |
+H = Hausgeld |
+R = Rücklagen |
 D = Dokumentation
 </div>
 
-<div id="ausgabe"></div>
+<div id="results"></div>
 
 </div>
 </div>
 
 <script>
+function startSearch(){
+const results = document.getElementById("results");
 
-function bewerten(){
-
-let lage = 20;
-let preis = 18;
-let zustand = 14;
-let energie = 10;
-let hausgeld = 6;
-let dokumente = 8;
-
-let gesamt =
-lage +
-preis +
-zustand +
-energie +
-hausgeld +
-dokumente;
-
-let farbe = "green";
-let status = "🟢 Kaufwürdig";
-
-if(gesamt < 80){
-farbe = "yellow";
-status = "🟡 Prüfen";
-}
-
-if(gesamt < 60){
-farbe = "red";
-status = "🔴 Eher nicht";
-}
-
-document.getElementById("ausgabe").innerHTML = `
-
-<div class="result ${farbe}">
-
-<h2>Wohnung München-Schwabing</h2>
-
-<div class="score">
-${gesamt}/100 Punkte
-</div>
-
-<p>
-${status}
-</p>
-
-<hr>
-
-<b>Punkteübersicht</b>
-
-<ul>
-<li>Lage: ${lage}/20</li>
-<li>Preis: ${preis}/20</li>
-<li>Zustand: ${zustand}/15</li>
-<li>Energie: ${energie}/10</li>
-<li>Hausgeld: ${hausgeld}/10</li>
-<li>Dokumentation: ${dokumente}/10</li>
-</ul>
+results.innerHTML = `
+<div class="result green">
+<h3>Wohnung München-Schwabing</h3>
+<p><strong>Bewertung:</strong> 8/10 🟢</p>
+<p><strong>Kürzel:</strong> L+ | P+ | Z+ | E+ | H-</p>
+<p><strong>Empfehlung:</strong> Interessant – Besichtigung empfohlen</p>
 
 <div class="reason">
-
-<b>Warum?</b>
-
+<strong>Warum?</strong>
 <ul>
-<li>Sehr gute Lage</li>
-<li>Preis im Marktbereich</li>
-<li>Guter Zustand</li>
-<li>Energieklasse positiv</li>
-<li>Hausgeld leicht erhöht</li>
+<li>Gute Lage mit starker Infrastruktur</li>
+<li>Preis wirkt marktgerecht</li>
+<li>Guter Zustand laut Exposé</li>
+<li>Energieangaben positiv</li>
+<li>Hausgeld sollte geprüft werden</li>
 </ul>
-
+</div>
 </div>
 
+<div class="result yellow">
+<h3>Wohnung München-Ost</h3>
+<p><strong>Bewertung:</strong> 6/10 🟡</p>
+<p><strong>Kürzel:</strong> L+ | P- | Z- | D-</p>
+<p><strong>Empfehlung:</strong> Prüfen – Unterlagen und Zustand genauer ansehen</p>
+
+<div class="reason">
+<strong>Warum?</strong>
+<ul>
+<li>Lage grundsätzlich interessant</li>
+<li>Preis erscheint etwas hoch</li>
+<li>Zustand unklar oder renovierungsbedürftig</li>
+<li>Exposé wirkt unvollständig</li>
+</ul>
+</div>
 </div>
 
+<div class="result red">
+<h3>Wohnung München-Randlage</h3>
+<p><strong>Bewertung:</strong> 3/10 🔴</p>
+<p><strong>Kürzel:</strong> L- | P- | Z- | E-</p>
+<p><strong>Empfehlung:</strong> Eher nicht – nur bei besonderem Interesse prüfen</p>
+
+<div class="reason">
+<strong>Warum?</strong>
+<ul>
+<li>Schwächere Lage</li>
+<li>Preis wirkt zu hoch</li>
+<li>Sanierungsbedarf möglich</li>
+<li>Energieangaben negativ oder unklar</li>
+</ul>
+</div>
+</div>
 `;
-
 }
 </script>
 
