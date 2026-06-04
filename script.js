@@ -23,6 +23,11 @@ function generateRandomProperties() {
     "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1200&q=80"
   ];
 
+  const interest1 = Number(document.getElementById("interest1").value) / 100;
+  const repayment1 = Number(document.getElementById("repayment1").value) / 100;
+  const interest2 = Number(document.getElementById("interest2").value) / 100;
+  const repayment2 = Number(document.getElementById("repayment2").value) / 100;
+
   const properties = [];
 
   for (let i = 1; i <= 10; i++) {
@@ -81,10 +86,8 @@ function generateRandomProperties() {
     if (houseMoney < 220) houseMoneyStatus = "🟢 niedrig";
     if (houseMoney > 330) houseMoneyStatus = "🔴 hoch";
 
-    const loanAmount = price;
-    const interestRate = 0.035;
-    const repaymentRate = 0.01;
-    const monthlyRate = Math.round((loanAmount * (interestRate + repaymentRate)) / 12);
+    const monthlyRate1 = Math.round((price * (interest1 + repayment1)) / 12);
+    const monthlyRate2 = Math.round((price * (interest2 + repayment2)) / 12);
 
     properties.push({
       title: `Objekt ${i}`,
@@ -110,7 +113,12 @@ function generateRandomProperties() {
       link: "https://www.immobilienscout24.de",
       recommendation,
       dealScore,
-      monthlyRate
+      monthlyRate1,
+      monthlyRate2,
+      interest1,
+      repayment1,
+      interest2,
+      repayment2
     });
   }
 
@@ -127,6 +135,11 @@ function searchProperties() {
   const redCount = properties.filter(p => p.score < 60).length;
   const bestScore = properties[0].score;
   const now = new Date().toLocaleString("de-DE");
+
+  const interest1Value = document.getElementById("interest1").value;
+  const repayment1Value = document.getElementById("repayment1").value;
+  const interest2Value = document.getElementById("interest2").value;
+  const repayment2Value = document.getElementById("repayment2").value;
 
   let html = `
     <h2>Gefundene Immobilien</h2>
@@ -182,17 +195,26 @@ function searchProperties() {
         <p><strong>Kaufempfehlung:</strong> ${property.recommendation}</p>
 
         <div class="box">
-          <strong>Finanzierungsbeispiel</strong><br><br>
+          <strong>Finanzierungsbeispiel 1</strong><br><br>
           Kaufpreis: ${property.price.toLocaleString()} €<br>
           Eigenkapital: 0 €<br>
-          Zins: 3,5 %<br>
-          Tilgung: 1,0 %<br>
-          Geschätzte Monatsrate: ca. ${property.monthlyRate.toLocaleString()} €
+          Zins: ${interest1Value} %<br>
+          Tilgung: ${repayment1Value} %<br>
+          Geschätzte Monatsrate: ca. ${property.monthlyRate1.toLocaleString()} €
+        </div>
+
+        <div class="box">
+          <strong>Finanzierungsbeispiel 2</strong><br><br>
+          Kaufpreis: ${property.price.toLocaleString()} €<br>
+          Eigenkapital: 0 €<br>
+          Zins: ${interest2Value} %<br>
+          Tilgung: ${repayment2Value} %<br>
+          Geschätzte Monatsrate: ca. ${property.monthlyRate2.toLocaleString()} €
         </div>
 
         <div class="box">
           ⚠️ <strong>Hinweis ohne Gewähr:</strong><br>
-          Diese Bewertung und das Finanzierungsbeispiel sind automatisierte Orientierungshilfen.
+          Diese Bewertung und die Finanzierungsbeispiele sind automatisierte Orientierungshilfen.
           Sie ersetzen keine Besichtigung, keine technische Prüfung, keine Finanzierungsberatung,
           keine Rechtsberatung und keine professionelle Wertermittlung. Alle Angaben ohne Gewähr.
         </div>
