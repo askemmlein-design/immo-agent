@@ -19,11 +19,6 @@ button{background:#2563eb;color:white;font-weight:bold;border:none;cursor:pointe
 .green{border-left:8px solid #22c55e}
 .yellow{border-left:8px solid #facc15}
 .red{border-left:8px solid #ef4444}
-.rank{font-size:22px;font-weight:bold}
-.meta{color:#555;font-size:14px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.small{font-size:14px;color:#666}
-.object-img{width:100%;height:260px;object-fit:cover;border-radius:12px;margin-bottom:15px;background:#ddd}
 </style>
 </head>
 
@@ -61,19 +56,33 @@ button{background:#2563eb;color:white;font-weight:bold;border:none;cursor:pointe
 <label>Suchradius (km)</label>
 <input id="radius" type="number" value="25">
 
+<h3>Finanzierung</h3>
+
+<label>Zins Beispiel 1 (%)</label>
+<input id="interest1" type="number" step="0.1" value="3.5">
+
+<label>Tilgung Beispiel 1 (%)</label>
+<input id="repayment1" type="number" step="0.1" value="1.0">
+
+<label>Zins Beispiel 2 (%)</label>
+<input id="interest2" type="number" step="0.1" value="4.5">
+
+<label>Tilgung Beispiel 2 (%)</label>
+<input id="repayment2" type="number" step="0.1" value="1.0">
+
 <button onclick="searchProperties()">Automatisch suchen & bewerten</button>
 </div>
 
 <div id="linksMode" style="display:none">
 <h3>Mehrere Links bewerten</h3>
 <textarea rows="7" placeholder="Hier mehrere ImmoScout-Links einfügen, je Link eine Zeile"></textarea>
-<button onclick="showLinkResults()">Links auswerten</button>
+<button>Links auswerten</button>
 </div>
 
 <div id="textMode" style="display:none">
 <h3>Exposé oder Text bewerten</h3>
 <textarea rows="10" placeholder="Hier Exposé-Text einfügen"></textarea>
-<button onclick="showTextResult()">Text bewerten</button>
+<button>Text bewerten</button>
 </div>
 
 <div class="box">
@@ -103,130 +112,8 @@ document.getElementById(mode+"Mode").style.display="block";
 document.getElementById(mode+"Btn").classList.add("active");
 document.getElementById("results").innerHTML="";
 }
-
-function card(rank,title,score,status,css,price,area,year,codes,img,why){
-return `
-<div class="result ${css}">
-<img class="object-img" src="${img}" alt="${title}">
-
-<div class="rank">${rank}</div>
-<h3>${title}</h3>
-<h2>${score}/100 Punkte ${status}</h2>
-
-<div class="grid">
-<p><strong>Preis:</strong> ${price}</p>
-<p><strong>Wohnfläche:</strong> ${area}</p>
-<p><strong>Baujahr:</strong> ${year}</p>
-<p><strong>Kürzel:</strong> ${codes}</p>
-</div>
-
-<hr>
-
-<strong>Warum?</strong>
-<ul>${why}</ul>
-
-<p class="small">Demo-Ranking mit Bild-URL. Später können hier echte Exposé-Bilder erscheinen.</p>
-</div>
-`;
-}
-
-function showAutoResults(){
-document.getElementById("results").innerHTML=`
-<h3>Gefundene Immobilien: 5</h3>
-<p class="meta">Sortiert nach Bewertung – beste Treffer zuerst.</p>
-
-${card(
-"🥇 Platz 1",
-"Wohnung München-Schwabing",
-86,
-"🟢 Interessant",
-"green",
-"198.000 €",
-"48 m²",
-"2008",
-"L+ | P+ | Z+ | E+ | H- | D+",
-"https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1200&q=80",
-"<li>Sehr gute Lage</li><li>Preis im Zielbereich</li><li>Guter Zustand</li><li>Dokumentation ordentlich</li>"
-)}
-
-${card(
-"🥈 Platz 2",
-"Wohnung München-Giesing",
-78,
-"🟡 Prüfen",
-"yellow",
-"189.000 €",
-"42 m²",
-"1995",
-"L+ | P+ | Z± | E? | H-",
-"https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=1200&q=80",
-"<li>Gute Lage</li><li>Preis interessant</li><li>Zustand prüfen</li><li>Hausgeld auffällig</li>"
-)}
-
-${card(
-"🥉 Platz 3",
-"Wohnung München-Ost",
-71,
-"🟡 Prüfen",
-"yellow",
-"205.000 €",
-"51 m²",
-"1988",
-"L+ | P- | Z+ | E? | D-",
-"https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80",
-"<li>Lage grundsätzlich interessant</li><li>Preis leicht über Vorgabe</li><li>Exposé unvollständig</li>"
-)}
-
-${card(
-"Platz 4",
-"Wohnung Haar",
-63,
-"🟡 Prüfen",
-"yellow",
-"175.000 €",
-"39 m²",
-"1975",
-"L± | P+ | Z- | E-",
-"https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1200&q=80",
-"<li>Preis gut</li><li>Lage außerhalb Kerngebiet</li><li>Sanierungsrisiko möglich</li>"
-)}
-
-${card(
-"Platz 5",
-"Wohnung München-Randlage",
-48,
-"🔴 Eher nicht",
-"red",
-"220.000 €",
-"40 m²",
-"1968",
-"L- | P- | Z- | E-",
-"https://images.unsplash.com/photo-1560185127-6ed189bf02f4?auto=format&fit=crop&w=1200&q=80",
-"<li>Preis zu hoch</li><li>Schwächere Lage</li><li>Energie und Zustand kritisch</li>"
-)}
-`;
-}
-
-function showLinkResults(){
-document.getElementById("results").innerHTML=`
-<div class="result yellow">
-<h3>🔗 Link-Auswertung vorbereitet</h3>
-<h2>Stufe 2 🟡</h2>
-<p>Hier werden später mehrere Immobilien-Links automatisch gelesen, bewertet und als Ranking mit Bildern ausgegeben.</p>
-</div>
-`;
-}
-
-function showTextResult(){
-document.getElementById("results").innerHTML=`
-<div class="result green">
-<h3>📄 Exposé-Auswertung vorbereitet</h3>
-<h2>Stufe 1 🟢</h2>
-<p>Hier wird später ein eingefügter Exposé-Text analysiert und automatisch bewertet.</p>
-</div>
-`;
-}
 </script>
+
 <script src="script.js"></script>
 </body>
 </html>
