@@ -3,126 +3,163 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ImmoAgent</title>
+<title>ImmoAgent Alpha</title>
 <style>
 body{font-family:Arial,sans-serif;background:#f4f6f8;margin:0;padding:30px}
-.container{max-width:850px;margin:auto}
+.container{max-width:900px;margin:auto}
 .card{background:white;padding:25px;border-radius:16px;box-shadow:0 2px 14px rgba(0,0,0,.12)}
-input,select,button{width:100%;padding:12px;margin:8px 0 16px;border-radius:8px;border:1px solid #ddd}
-button{background:#0057ff;color:white;border:none;font-size:16px;cursor:pointer}
-.legend,.result{background:#eef2f7;padding:16px;border-radius:12px;margin-top:20px}
-.result.green{border-left:8px solid #22c55e}
-.result.yellow{border-left:8px solid #facc15}
-.result.red{border-left:8px solid #ef4444}
-.why{background:white;padding:14px;border-radius:10px;margin-top:14px}
+input,select,textarea,button{width:100%;padding:12px;margin:8px 0 18px;border-radius:8px;border:1px solid #ddd}
+button{background:#2563eb;color:white;font-weight:bold;border:none;cursor:pointer}
+.mode-buttons{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.mode-buttons button{background:#e5e7eb;color:#111}
+.mode-buttons button.active{background:#2563eb;color:white}
+.box{background:#eef2f7;padding:15px;border-radius:12px;margin-top:15px}
+.result{margin-top:20px;padding:18px;border-radius:12px;background:#eef6ff;border-left:8px solid #22c55e}
+.yellow{border-left-color:#facc15}
+.red{border-left-color:#ef4444}
+.small{font-size:14px;color:#666}
 </style>
 </head>
-<body>
 
+<body>
 <div class="container">
 <div class="card">
 
 <h1>🏡 ImmoAgent Alpha</h1>
 <p>Immobilien bewerten statt nur suchen.</p>
 
+<h3>Betriebsart wählen</h3>
+
+<div class="mode-buttons">
+<button id="autoBtn" class="active" onclick="setMode('auto')">🔍 Automatische Suche</button>
+<button id="linksBtn" onclick="setMode('links')">🔗 Links bewerten</button>
+<button id="textBtn" onclick="setMode('text')">📄 Exposé/Text</button>
+</div>
+
+<div id="autoMode">
+<h3>Automatische Suche</h3>
+
 <label>Objektart</label>
-<select id="type">
+<select>
 <option>Wohnung Kauf</option>
 <option>Wohnung Miete</option>
 <option>Haus Kauf</option>
 <option>Haus Miete</option>
+<option>Garage Kauf</option>
+<option>Garage Miete</option>
 </select>
 
 <label>Maximalpreis (€)</label>
-<input id="price" type="number" value="200000">
+<input type="number" value="200000">
 
 <label>Suchradius (km)</label>
-<input id="radius" type="number" value="25">
+<input type="number" value="25">
 
-<label>Wohnfläche (m²)</label>
-<input id="size" type="number" value="50">
+<button onclick="showAutoResults()">Automatisch suchen & bewerten</button>
+</div>
 
-<label>Baujahr</label>
-<input id="year" type="number" value="2000">
+<div id="linksMode" style="display:none">
+<h3>Mehrere Links bewerten</h3>
+<textarea rows="7" placeholder="Hier mehrere ImmoScout-Links einfügen, je Link eine Zeile"></textarea>
+<button onclick="showLinkResults()">Links auswerten</button>
+</div>
 
-<label>Energieklasse</label>
-<select id="energy">
-<option>A+</option><option>A</option><option>B</option><option>C</option>
-<option>D</option><option>E</option><option>F</option>
-</select>
+<div id="textMode" style="display:none">
+<h3>Exposé oder Text bewerten</h3>
+<textarea rows="10" placeholder="Hier Exposé-Text einfügen"></textarea>
+<button onclick="showTextResult()">Text bewerten</button>
+</div>
 
-<label>Hausgeld (€)</label>
-<input id="fee" type="number" value="280">
-
-<button onclick="bewerten()">Bewerten</button>
-
-<div class="legend">
-<b>Bewertungslogik</b><br><br>
+<div class="box">
+<strong>Bewertungslogik</strong><br><br>
 🟢 80–100 Punkte = Interessant<br>
 🟡 60–79 Punkte = Prüfen<br>
 🔴 0–59 Punkte = Eher nicht<br><br>
 L = Lage | P = Preis | Z = Zustand | E = Energie | H = Hausgeld | D = Dokumentation | R = Rücklagen
 </div>
 
-<div id="result"></div>
+<div id="results"></div>
 
 </div>
 </div>
 
 <script>
-function bewerten(){
-let price = Number(document.getElementById("price").value);
-let size = Number(document.getElementById("size").value);
-let year = Number(document.getElementById("year").value);
-let energy = document.getElementById("energy").value;
-let fee = Number(document.getElementById("fee").value);
+function setMode(mode){
+document.getElementById("autoMode").style.display="none";
+document.getElementById("linksMode").style.display="none";
+document.getElementById("textMode").style.display="none";
 
-let sqmPrice = price / size;
+document.getElementById("autoBtn").classList.remove("active");
+document.getElementById("linksBtn").classList.remove("active");
+document.getElementById("textBtn").classList.remove("active");
 
-let lage = 18;
-let preis = sqmPrice <= 4500 ? 20 : sqmPrice <= 6500 ? 15 : 8;
-let zustand = year >= 2010 ? 15 : year >= 1990 ? 11 : 7;
+document.getElementById(mode+"Mode").style.display="block";
+document.getElementById(mode+"Btn").classList.add("active");
+document.getElementById("results").innerHTML="";
+}
 
-let energieMap = {"A+":15,"A":14,"B":12,"C":10,"D":7,"E":4,"F":2};
-let energie = energieMap[energy];
-
-let hausgeld = fee <= 250 ? 10 : fee <= 400 ? 7 : 3;
-let dokumentation = 8;
-let ruecklagen = 7;
-
-let total = lage + preis + zustand + energie + hausgeld + dokumentation + ruecklagen;
-
-let color = total >= 80 ? "green" : total >= 60 ? "yellow" : "red";
-let ampel = total >= 80 ? "🟢 Interessant" : total >= 60 ? "🟡 Prüfen" : "🔴 Eher nicht";
-
-document.getElementById("result").innerHTML = `
-<div class="result ${color}">
-<h2>Bewertungsergebnis</h2>
-<h3>${total}/100 Punkte</h3>
-<p><b>${ampel}</b></p>
+function showAutoResults(){
+document.getElementById("results").innerHTML=`
+<div class="result">
+<h3>Wohnung München-Schwabing</h3>
+<h2>86/100 Punkte 🟢</h2>
+<p><strong>Status:</strong> Interessant</p>
+<p><strong>Kürzel:</strong> L+ | P+ | Z+ | E+ | H- | D+</p>
 <hr>
-<b>Punkteübersicht</b>
+<strong>Punkteübersicht</strong>
 <ul>
-<li>Lage: ${lage}/20</li>
-<li>Preis: ${preis}/20 (${Math.round(sqmPrice)} €/m²)</li>
-<li>Zustand: ${zustand}/15</li>
-<li>Energie: ${energie}/15</li>
-<li>Hausgeld: ${hausgeld}/10</li>
-<li>Dokumentation: ${dokumentation}/10</li>
-<li>Rücklagen: ${ruecklagen}/10</li>
+<li>Lage: 20/20</li>
+<li>Preis: 18/20</li>
+<li>Zustand: 14/15</li>
+<li>Energie: 12/15</li>
+<li>Hausgeld: 7/10</li>
+<li>Dokumentation: 15/20</li>
 </ul>
-
-<div class="why">
-<b>Warum?</b>
+<strong>Warum?</strong>
 <ul>
-<li>Preis pro m² wurde automatisch berechnet</li>
-<li>Baujahr beeinflusst die Zustandsbewertung</li>
-<li>Energieklasse beeinflusst die Energiebewertung</li>
-<li>Hausgeld wird nach Höhe bewertet</li>
-<li>Lage, Dokumentation und Rücklagen sind aktuell noch Basiswerte</li>
+<li>Sehr gute Lage</li>
+<li>Preis wirkt marktgerecht</li>
+<li>Guter Zustand</li>
+<li>Energieangaben positiv</li>
+<li>Hausgeld prüfen</li>
 </ul>
+<p class="small">Hinweis: Aktuell Demo-Daten. Im nächsten Schritt wird echte Datenverarbeitung ergänzt.</p>
 </div>
-</div>`;
+
+<div class="result yellow">
+<h3>Wohnung München-Ost</h3>
+<h2>71/100 Punkte 🟡</h2>
+<p><strong>Status:</strong> Prüfen</p>
+<p><strong>Kürzel:</strong> L+ | P- | Z+ | E? | D-</p>
+</div>
+
+<div class="result red">
+<h3>Wohnung München-Randlage</h3>
+<h2>48/100 Punkte 🔴</h2>
+<p><strong>Status:</strong> Eher nicht</p>
+<p><strong>Kürzel:</strong> L- | P- | Z- | E-</p>
+</div>
+`;
+}
+
+function showLinkResults(){
+document.getElementById("results").innerHTML=`
+<div class="result yellow">
+<h3>Link-Auswertung</h3>
+<h2>Stufe 2 vorbereitet 🟡</h2>
+<p>Hier werden später mehrere ImmoScout-Links automatisch ausgelesen und bewertet.</p>
+</div>
+`;
+}
+
+function showTextResult(){
+document.getElementById("results").innerHTML=`
+<div class="result">
+<h3>Exposé-Auswertung</h3>
+<h2>Stufe 1 vorbereitet 🟢</h2>
+<p>Hier wird später ein eingefügter Exposé-Text automatisch analysiert.</p>
+</div>
+`;
 }
 </script>
 
