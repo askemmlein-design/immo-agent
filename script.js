@@ -314,7 +314,56 @@ const properties = apiProperties.map(property => {
 <details>
 
   <summary>Warum diese Bewertung?</summary>
+        <details>
+          <summary>Investment-Check</summary>
+          <br>
 
+          Bruttorendite: ${
+            property.coldRent > 0
+              ? (
+                  ((property.coldRent * 12 / property.price) * 100) >= 4
+                    ? "🟢 attraktiv"
+                    : ((property.coldRent * 12 / property.price) * 100) >= 3
+                    ? "🟡 okay"
+                    : "🔴 niedrig"
+                )
+              : "nicht berechenbar"
+          }<br>
+
+          Vermietungsstatus: ${
+            property.rentalStatus === "vermietet"
+              ? "🟢 bereits vermietet"
+              : "🟡 frei / neu vermietbar"
+          }<br>
+
+          Hausgeld: ${
+            property.houseFee > 0
+              ? (
+                  property.houseFee <= 180
+                    ? "🟢 niedrig"
+                    : property.houseFee <= 300
+                    ? "🟡 normal"
+                    : "🔴 hoch"
+                )
+              : "nicht angegeben"
+          }<br><br>
+
+          Investor-Kaufsignal: ${
+            property.coldRent > 0 &&
+            ((property.coldRent * 12 / property.price) * 100) >= 4
+              ? "🟢 Für Kapitalanlage interessant"
+              : property.rentalStatus === "frei"
+              ? "🟡 Eher Eigennutzung / Neuvermietung prüfen"
+              : "🟡 Genau prüfen"
+          }<br><br>
+
+          Exposé-Checkliste:<br>
+          ☐ Energieausweis prüfen<br>
+          ☐ Hausgeldabrechnung prüfen<br>
+          ☐ Rücklagen / WEG-Protokolle prüfen<br>
+          ☐ Mietvertrag prüfen<br>
+          ☐ Sondernutzung oder Hobbyraum prüfen
+        </details>
   <br>
 
   Preisbewertung: ${
