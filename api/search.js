@@ -2,6 +2,10 @@ export default function handler(req, res) {
 
   const maxPrice = Number(req.query.maxPrice || 999999999);
 
+  const type = String(req.query.type || "").toLowerCase();
+
+  const radius = Number(req.query.radius || 999);
+
   const data = [
 
     {
@@ -10,7 +14,11 @@ export default function handler(req, res) {
 
       title: "Testwohnung München",
 
+      type: "Wohnung Kauf",
+
       location: "München",
+
+      distance: 8,
 
       rooms: 1,
 
@@ -36,7 +44,11 @@ export default function handler(req, res) {
 
       title: "Testwohnung München-Giesing",
 
+      type: "Wohnung Kauf",
+
       location: "München-Giesing",
+
+      distance: 18,
 
       rooms: 1,
 
@@ -62,7 +74,11 @@ export default function handler(req, res) {
 
       title: "Testwohnung München-Sendling",
 
+      type: "Wohnung Kauf",
+
       location: "München-Sendling",
+
+      distance: 24,
 
       rooms: 1,
 
@@ -80,11 +96,51 @@ export default function handler(req, res) {
 
       email: "siehe Exposé"
 
+    },
+
+    {
+
+      id: "api-4",
+
+      title: "Testhaus München-Ost",
+
+      type: "Haus Kauf",
+
+      location: "München-Ost",
+
+      distance: 12,
+
+      rooms: 4,
+
+      area: 110,
+
+      price: 590000,
+
+      image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1200&q=80",
+
+      link: "https://www.immobilienscout24.de",
+
+      seller: "API-Test Anbieter",
+
+      phone: "siehe Exposé",
+
+      email: "siehe Exposé"
+
     }
 
   ];
 
-  const filtered = data.filter(item => item.price <= maxPrice);
+  const filtered = data.filter(item => {
+
+    const priceOk = item.price <= maxPrice;
+
+    const typeOk = !type || item.type.toLowerCase() === type;
+
+    const radiusOk = item.distance <= radius;
+
+    return priceOk && typeOk && radiusOk;
+
+  });
 
   res.status(200).json(filtered);
 
