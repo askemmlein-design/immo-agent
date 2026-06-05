@@ -266,7 +266,32 @@ const properties = apiProperties.map(property => {
 
         <p><strong>📍 Standort:</strong> ${property.location}</p>
         <p><strong>${property.score}/100 Punkte</strong> ${property.status}</p>
-        <p>${topDeal}</p>
+<p>${topDeal}</p>
+
+<p>
+<strong>🏆 Gesamturteil:</strong>
+${
+  property.score >= 90
+    ? "🟢 KAUFEMPFEHLUNG"
+    : property.score >= 80
+    ? "🟢 INTERESSANT"
+    : property.score >= 60
+    ? "🟡 GENAU PRÜFEN"
+    : "🔴 EHER NICHT"
+}
+</p>
+
+<p>
+${
+  property.score >= 90
+    ? "✓ Sehr gutes Preis-Leistungs-Verhältnis"
+    : property.score >= 80
+    ? "✓ Objekt wirkt attraktiv"
+    : property.score >= 60
+    ? "✓ Weitere Prüfung notwendig"
+    : "✗ Aktuell kein Favorit"
+}
+</p>
 
         <button class="favorite-btn" onclick="toggleFavorite('${property.id}')">
           ${isFavorite ? "⭐ Favorit gespeichert" : "☆ Zu Favoriten hinzufügen"}
