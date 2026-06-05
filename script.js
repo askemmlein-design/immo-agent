@@ -143,13 +143,21 @@ async function searchProperties() {
 
   const maxPrice = document.getElementById("maxPrice").value || 999999999;
 
-const type = encodeURIComponent(document.getElementById("type").value);
+const type = encodeURIComponent(
 
-const radius = document.getElementById("radius").value || 999;
+  document.getElementById("type").value
 
-const response = await fetch(`/api/search?maxPrice=${maxPrice}&type=${type}&radius=${radius}`);
+);
 
-const response = await fetch(`/api/search?maxPrice=${maxPrice}`);
+const radius =
+
+  document.getElementById("radius").value || 999;
+
+const response = await fetch(
+
+  `/api/search?maxPrice=${maxPrice}&type=${type}&radius=${radius}`
+
+);
 
 const apiProperties = await response.json();
 
