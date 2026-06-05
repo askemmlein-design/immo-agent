@@ -1,6 +1,8 @@
 export default function handler(req, res) {
 
-  res.status(200).json([
+  const maxPrice = Number(req.query.maxPrice || 999999999);
+
+  const data = [
 
     {
 
@@ -52,8 +54,38 @@ export default function handler(req, res) {
 
       email: "siehe Exposé"
 
+    },
+
+    {
+
+      id: "api-3",
+
+      title: "Testwohnung München-Sendling",
+
+      location: "München-Sendling",
+
+      rooms: 1,
+
+      area: 24,
+
+      price: 145000,
+
+      image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80",
+
+      link: "https://www.immobilienscout24.de",
+
+      seller: "API-Test Anbieter",
+
+      phone: "siehe Exposé",
+
+      email: "siehe Exposé"
+
     }
 
-  ]);
+  ];
+
+  const filtered = data.filter(item => item.price <= maxPrice);
+
+  res.status(200).json(filtered);
 
 }
