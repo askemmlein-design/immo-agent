@@ -402,7 +402,63 @@ const properties = apiProperties.map(property => {
           ☐ Mietvertrag prüfen<br>
           ☐ Sondernutzung oder Hobbyraum prüfen
         </details>
+<details>
 
+<summary>📍 Lagebewertung</summary>
+
+<br>
+
+Lage-Score: ${
+
+  property.location.toLowerCase().includes("schwabing")
+
+    ? "🟢 Top-Lage"
+
+    : property.location.toLowerCase().includes("maxvorstadt")
+
+    ? "🟢 Top-Lage"
+
+    : property.location.toLowerCase().includes("haidhausen")
+
+    ? "🟢 Top-Lage"
+
+    : property.location.toLowerCase().includes("bogenhausen")
+
+    ? "🟢 Sehr gute Lage"
+
+    : property.location.toLowerCase().includes("giesing")
+
+    ? "🟡 Gute Lage"
+
+    : property.location.toLowerCase().includes("perlach")
+
+    ? "🟡 Solide Lage"
+
+    : "⚪ Lage manuell prüfen"
+
+}<br><br>
+
+Vermietbarkeit: ${
+
+  property.location.toLowerCase().includes("münchen")
+
+    ? "🟢 Grundsätzlich sehr gut"
+
+    : "🟡 Prüfen"
+
+}<br><br>
+
+Entfernung: ${
+
+  property.distance
+
+    ? property.distance + " km"
+
+    : "nicht angegeben"
+
+}
+
+</details>
         <details>
           <summary>Risikoanalyse</summary>
           <br>
