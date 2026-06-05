@@ -116,6 +116,14 @@ function getLocationSignal(property) {
 }
 function getDealBadge(property) {
 
+  const propertyType = (property.type || "").toLowerCase();
+
+  if (propertyType.includes("miete")) {
+
+    return "";
+
+  }
+
   const yieldValue = getYield(property);
 
   const riskSignal = getRiskSignal(property);
@@ -315,8 +323,22 @@ const topDeal = dealBadge
           📍 Lage: ${getLocationSignal(property)}
           &nbsp;&nbsp;
           💰 Rendite: ${
-            yieldValue >= 5 ? "🟢" : yieldValue >= 3 ? "🟡" : "🔴"
-          }
+
+  property.type && property.type.toLowerCase().includes("miete")
+
+    ? "➖"
+
+    : yieldValue >= 5
+
+    ? "🟢"
+
+    : yieldValue >= 3
+
+    ? "🟡"
+
+    : "🔴"
+
+}
           &nbsp;&nbsp;
           ⚠️ Risiko: ${getRiskSignal(property)}
         </p>
@@ -374,7 +396,15 @@ const topDeal = dealBadge
         <p><strong>Kaltmiete:</strong> ${(property.coldRent || 0).toLocaleString()} €</p>
         <p><strong>Nebenkosten:</strong> ${(property.additionalCosts || 0).toLocaleString()} €</p>
         <p><strong>Hausgeld:</strong> ${(property.houseFee || 0).toLocaleString()} €</p>
-        <p><strong>Bruttorendite:</strong> ${yieldValue.toFixed(2)} %</p>
+        ${
+
+  property.type && property.type.toLowerCase().includes("miete")
+
+    ? ""
+
+    : `<p><strong>Bruttorendite:</strong> ${yieldValue.toFixed(2)} %</p>`
+
+}
 
         <hr>
 
@@ -420,15 +450,31 @@ const topDeal = dealBadge
         <details>
           <summary>Investment-Check</summary>
           <br>
-          Bruttorendite: ${
-            yieldValue >= 4
-              ? "🟢 attraktiv"
-              : yieldValue >= 3
-              ? "🟡 okay"
-              : yieldValue > 0
-              ? "🔴 niedrig"
-              : "nicht berechenbar"
-          }<br>
+          ${
+
+  property.type && property.type.toLowerCase().includes("miete")
+
+    ? "Bruttorendite: nicht relevant bei Mietobjekt<br>"
+
+    : `Bruttorendite: ${
+
+        yieldValue >= 4
+
+          ? "🟢 attraktiv"
+
+          : yieldValue >= 3
+
+          ? "🟡 okay"
+
+          : yieldValue > 0
+
+          ? "🔴 niedrig"
+
+          : "nicht berechenbar"
+
+      }<br>`
+
+}
           Vermietungsstatus: ${
             property.rentalStatus === "vermietet"
               ? "🟢 bereits vermietet"
