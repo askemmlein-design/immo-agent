@@ -4,29 +4,53 @@ export default function handler(req, res) {
 
     {
 
-      id: 1,
+      id: "api-1",
 
       title: "Testwohnung München",
 
-      price: 199000,
+      location: "München",
+
+      rooms: 1,
 
       area: 32,
 
-      location: "München"
+      price: 199000,
+
+      image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1200&q=80",
+
+      link: "https://www.immobilienscout24.de",
+
+      seller: "API-Test Anbieter",
+
+      phone: "siehe Exposé",
+
+      email: "siehe Exposé"
 
     },
 
     {
 
-      id: 2,
+      id: "api-2",
 
-      title: "Testwohnung Giesing",
+      title: "Testwohnung München-Giesing",
 
-      price: 175000,
+      location: "München-Giesing",
+
+      rooms: 1,
 
       area: 28,
 
-      location: "München-Giesing"
+      price: 175000,
+
+      image: "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=1200&q=80",
+
+      link: "https://www.immobilienscout24.de",
+
+      seller: "API-Test Anbieter",
+
+      phone: "siehe Exposé",
+
+      email: "siehe Exposé"
 
     }
 
