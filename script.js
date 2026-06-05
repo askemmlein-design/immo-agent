@@ -141,7 +141,9 @@ async function searchProperties() {
   const repayment2 = Number(document.getElementById("repayment2").value) / 100;
   const equity = Number(document.getElementById("equity").value || 0);
 
-  const response = await fetch("/api/search");
+  const maxPrice = document.getElementById("maxPrice").value || 999999999;
+
+const response = await fetch(`/api/search?maxPrice=${maxPrice}`);
 
 const apiProperties = await response.json();
 
