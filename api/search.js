@@ -1,6 +1,6 @@
 export default function handler(req, res) {
 
-  const data = [
+  res.status(200).json([
 
     {
 
@@ -30,8 +30,6 @@ export default function handler(req, res) {
 
     }
 
-  ];
-
-  res.status(200).json(data);
+  ]);
 
 }
