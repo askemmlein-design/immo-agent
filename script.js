@@ -1,97 +1,3 @@
-const realProperties = [
-  {
-    id: "163844521",
-    title: "Hobbyraum mit Wohnqualität",
-    location: "80807 München-Milbertshofen",
-    rooms: 1,
-    area: 27.3,
-    price: 199000,
-    image: "https://pictures.immobilienscout24.de/listings/c6518e58-3aff-4966-856a-2782ab03c2e4-1963769375.jpg/ORIG/legacy_thumbnail/800x600/format/jpg",
-    link: "https://www.immobilienscout24.de/expose/163844521",
-    seller: "ImmoScout24",
-    phone: "siehe Exposé",
-    email: "siehe Exposé"
-  },
-  {
-    id: "165388352",
-    title: "1-Zimmer-Apartment in Milbertshofen",
-    location: "80807 München-Milbertshofen",
-    rooms: 1,
-    area: 17.85,
-    price: 195000,
-    image: "https://pictures.immobilienscout24.de/listings/61275c96-9b5b-491c-84d6-9f52cc8a1935-1994510424.jpg/ORIG/legacy_thumbnail/800x600/format/jpg",
-    link: "https://www.immobilienscout24.de/expose/165388352",
-    seller: "ImmoScout24",
-    phone: "siehe Exposé",
-    email: "siehe Exposé"
-  },
-  {
-    id: "166052791",
-    title: "STUDIO M - Vermietetes Studentenapartment",
-    location: "80687 München-Laim",
-    rooms: 1,
-    area: 21.44,
-    price: 200000,
-    image: "https://pictures.immobilienscout24.de/listings/fb03f650-5cf2-4914-9f10-1e3b89796f6e-2013847313.jpg/ORIG/legacy_thumbnail/800x600/format/jpg",
-    link: "https://www.immobilienscout24.de/expose/166052791",
-    seller: "ImmoScout24",
-    phone: "siehe Exposé",
-    email: "siehe Exposé"
-  },
-  {
-    id: "164751970",
-    title: "Hotelapartment als Investment",
-    location: "81379 München-Obersendling",
-    rooms: 1,
-    area: 23.06,
-    price: 102000,
-    image: "https://pictures.immobilienscout24.de/listings/0e9cad96-c55b-4d0f-8700-2d4999af463c-1977763494.jpg/ORIG/legacy_thumbnail/800x600/format/jpg",
-    link: "https://www.immobilienscout24.de/expose/164751970",
-    seller: "ImmoScout24",
-    phone: "siehe Exposé",
-    email: "siehe Exposé"
-  },
-  {
-    id: "167214786",
-    title: "4,1% Rendite: Investment im Perlachstift",
-    location: "81737 München-Perlach",
-    rooms: 1,
-    area: 24.77,
-    price: 159000,
-    image: "https://pictures.immobilienscout24.de/listings/9676b930-f61e-48bc-ab66-353bc2fbdcf9-2018520519.jpg/ORIG/legacy_thumbnail/800x600/format/jpg",
-    link: "https://www.immobilienscout24.de/expose/167214786",
-    seller: "ImmoScout24",
-    phone: "siehe Exposé",
-    email: "siehe Exposé"
-  },
-  {
-    id: "165591937",
-    title: "Vollausgebauter Speicher / Hobbyraum",
-    location: "81543 München-Untergiesing",
-    rooms: 1,
-    area: 25,
-    price: 120000,
-    image: "https://pictures.immobilienscout24.de/listings/85a85b2d-8648-4958-afa4-d0a6ad74642e-2036849506.jpg/ORIG/legacy_thumbnail/800x600/format/jpg",
-    link: "https://www.immobilienscout24.de/expose/165591937",
-    seller: "ImmoScout24",
-    phone: "siehe Exposé",
-    email: "siehe Exposé"
-  },
-  {
-    id: "166102272",
-    title: "Modernes Studentenapartment",
-    location: "81241 München-Pasing",
-    rooms: 1,
-    area: 16.64,
-    price: 189900,
-    image: "https://pictures.immobilienscout24.de/listings/55f53dbb-2afc-4d9a-b9d9-3f61cf0bd0ce-2030652103.jpg/ORIG/legacy_thumbnail/800x600/format/jpg",
-    link: "https://www.immobilienscout24.de/expose/166102272",
-    seller: "ImmoScout24",
-    phone: "siehe Exposé",
-    email: "siehe Exposé"
-  }
-];
-
 function getFavorites() {
   return JSON.parse(localStorage.getItem("favorites")) || [];
 }
@@ -131,6 +37,42 @@ function calculateScore(property) {
   return Math.min(score, 100);
 }
 
+function getYield(property) {
+  if (!property.coldRent || property.coldRent <= 0 || !property.price) return 0;
+  return (property.coldRent * 12 / property.price) * 100;
+}
+
+function getRiskSignal(property) {
+  const title = property.title.toLowerCase();
+
+  if (title.includes("hobbyraum")) return "🔴";
+  if (title.includes("hotel")) return "🔴";
+  if (title.includes("student")) return "🟡";
+
+  return "🟢";
+}
+
+function getLocationSignal(property) {
+  const location = property.location.toLowerCase();
+
+  if (
+    location.includes("schwabing") ||
+    location.includes("maxvorstadt") ||
+    location.includes("haidhausen")
+  ) {
+    return "🟢";
+  }
+
+  if (
+    location.includes("giesing") ||
+    location.includes("perlach")
+  ) {
+    return "🟡";
+  }
+
+  return "⚪";
+}
+
 async function searchProperties() {
   const results = document.getElementById("results");
   const favorites = getFavorites();
@@ -142,26 +84,15 @@ async function searchProperties() {
   const equity = Number(document.getElementById("equity").value || 0);
 
   const maxPrice = document.getElementById("maxPrice").value || 999999999;
+  const type = encodeURIComponent(document.getElementById("type").value);
+  const radius = document.getElementById("radius").value || 999;
 
-const type = encodeURIComponent(
+  results.innerHTML = "<p>Suche läuft...</p>";
 
-  document.getElementById("type").value
+  const response = await fetch(`/api/search?maxPrice=${maxPrice}&type=${type}&radius=${radius}`);
+  const apiProperties = await response.json();
 
-);
-
-const radius =
-
-  document.getElementById("radius").value || 999;
-
-const response = await fetch(
-
-  `/api/search?maxPrice=${maxPrice}&type=${type}&radius=${radius}`
-
-);
-
-const apiProperties = await response.json();
-
-const properties = apiProperties.map(property => {
+  const properties = apiProperties.map(property => {
     const score = calculateScore(property);
     const pricePerSqm = Math.round(property.price / property.area);
     const marketPricePerSqm = 9000;
@@ -245,7 +176,7 @@ const properties = apiProperties.map(property => {
       <summary>Suchstatistik</summary>
       <br>
       <strong>Suchlauf:</strong> ${now}<br><br>
-      <strong>${properties.length} echte Treffer</strong><br><br>
+      <strong>${properties.length} Treffer</strong><br><br>
       ⭐ ${starCount} | 🟢 ${greenCount} | 🟡 ${yellowCount} | 🔴 ${redCount}<br><br>
       <strong>Gespeicherte Favoriten:</strong> ${favorites.length}
     </details>
@@ -253,6 +184,7 @@ const properties = apiProperties.map(property => {
 
   properties.forEach((property, index) => {
     const isFavorite = favorites.includes(property.id);
+    const yieldValue = getYield(property);
     const topDeal = property.score >= 95
       ? "<span style='color:#16a34a;font-weight:bold'>🟢 TOP DEAL</span>"
       : "";
@@ -266,110 +198,65 @@ const properties = apiProperties.map(property => {
 
         <p><strong>📍 Standort:</strong> ${property.location}</p>
         <p><strong>${property.score}/100 Punkte</strong> ${property.status}</p>
-<p>${topDeal}</p>
+        <p>${topDeal}</p>
 
-<p>
-<strong>🏆 Gesamturteil:</strong>
-${
-  property.score >= 90
-    ? "🟢 KAUFEMPFEHLUNG"
-    : property.score >= 80
-    ? "🟢 INTERESSANT"
-    : property.score >= 60
-    ? "🟡 GENAU PRÜFEN"
-    : "🔴 EHER NICHT"
-}
-</p>
+        <p>
+          <strong>🏆 Gesamturteil:</strong>
+          ${
+            property.score >= 90
+              ? "🟢 KAUFEMPFEHLUNG"
+              : property.score >= 80
+              ? "🟢 INTERESSANT"
+              : property.score >= 60
+              ? "🟡 GENAU PRÜFEN"
+              : "🔴 EHER NICHT"
+          }
+        </p>
 
-<p>
-<p>
+        <p>
+          📍 Lage: ${getLocationSignal(property)}
+          &nbsp;&nbsp;
+          💰 Rendite: ${
+            yieldValue >= 5 ? "🟢" : yieldValue >= 3 ? "🟡" : "🔴"
+          }
+          &nbsp;&nbsp;
+          ⚠️ Risiko: ${getRiskSignal(property)}
+        </p>
 
-📍 Lage:
-${
-  property.location.toLowerCase().includes("schwabing") ||
-  property.location.toLowerCase().includes("maxvorstadt") ||
-  property.location.toLowerCase().includes("haidhausen")
-    ? "🟢"
-    : property.location.toLowerCase().includes("giesing") ||
-      property.location.toLowerCase().includes("perlach")
-    ? "🟡"
-    : "⚪"
-}
+        <p>
+          📈 Marktchance:
+          ${
+            property.pricePerSqm < 7000
+              ? "🟢 Stark unter Markt"
+              : property.pricePerSqm < 9000
+              ? "🟡 Marktgerecht"
+              : "🔴 Über Markt"
+          }
+        </p>
 
-&nbsp;&nbsp;
+        <p>
+          🏦 Finanzierungsrisiko:
+          ${
+            property.monthlyRate1 <= 800
+              ? "🟢 Gut tragbar"
+              : property.monthlyRate1 <= 1200
+              ? "🟡 Prüfen"
+              : "🔴 Hohe Belastung"
+          }
+        </p>
 
-💰 Rendite:
-${
-  property.coldRent > 0 &&
-  ((property.coldRent * 12) / property.price) * 100 >= 5
-    ? "🟢"
-    : property.coldRent > 0 &&
-      ((property.coldRent * 12) / property.price) * 100 >= 3
-    ? "🟡"
-    : "🔴"
-}
+        <p>
+          ${
+            property.score >= 90
+              ? "✓ Sehr gutes Preis-Leistungs-Verhältnis"
+              : property.score >= 80
+              ? "✓ Objekt wirkt attraktiv"
+              : property.score >= 60
+              ? "✓ Weitere Prüfung notwendig"
+              : "✗ Aktuell kein Favorit"
+          }
+        </p>
 
-&nbsp;&nbsp;
-
-⚠️ Risiko:
-${
-  property.title.toLowerCase().includes("hobbyraum")
-    ? "🔴"
-    : property.title.toLowerCase().includes("hotel")
-    ? "🔴"
-    : property.title.toLowerCase().includes("student")
-    ? "🟡"
-    : "🟢"
-}
-
-</p>
-${
-  property.score >= 90
-    ? "✓ Sehr gutes Preis-Leistungs-Verhältnis"
-    : property.score >= 80
-    ? "✓ Objekt wirkt attraktiv"
-    : property.score >= 60
-    ? "✓ Weitere Prüfung notwendig"
-    : "✗ Aktuell kein Favorit"
-}
-<p>
-
-📈 Marktchance:
-
-${
-
-property.pricePerSqm < 7000
-
-? "🟢 Stark unter Markt"
-
-: property.pricePerSqm < 9000
-
-? "🟡 Marktgerecht"
-
-: "🔴 Über Markt"
-
-}
-
-</p>
-<p>
-
-🏦 Finanzierungsrisiko:
-
-${
-
-property.monthlyRate1 <= 800
-
-? "🟢 Gut tragbar"
-
-: property.monthlyRate1 <= 1200
-
-? "🟡 Prüfen"
-
-: "🔴 Hohe Belastung"
-
-}
-
-</p>
         <button class="favorite-btn" onclick="toggleFavorite('${property.id}')">
           ${isFavorite ? "⭐ Favorit gespeichert" : "☆ Zu Favoriten hinzufügen"}
         </button>
@@ -377,48 +264,29 @@ property.monthlyRate1 <= 800
         <hr>
 
         <p><strong>Preis:</strong> ${property.price.toLocaleString()} €</p>
+        <p><strong>Wohnfläche:</strong> ${property.area} m²</p>
+        <p><strong>Zimmer:</strong> ${property.rooms}</p>
+        <p><strong>Preis/m²:</strong> ${property.pricePerSqm.toLocaleString()} €/m²</p>
+        <p><strong>Marktvergleich:</strong> ${property.marketText}</p>
 
-<p><strong>Wohnfläche:</strong> ${property.area} m²</p>
+        <p><strong>Vermietung:</strong> ${
+          property.rentalStatus === "vermietet" ? "🟢 Vermietet" : "🏠 Frei"
+        }</p>
 
-<p><strong>Zimmer:</strong> ${property.rooms}</p>
-
-<p><strong>Preis/m²:</strong> ${property.pricePerSqm.toLocaleString()} €/m²</p>
-
-<p><strong>Marktvergleich:</strong> ${property.marketText}</p>
-
-<p><strong>Vermietung:</strong> ${
-
-  property.rentalStatus === "vermietet" ? "🟢 Vermietet" : "🏠 Frei"
-
-}</p>
-
-<p><strong>Kaltmiete:</strong> ${(property.coldRent || 0).toLocaleString()} €</p>
-
-<p><strong>Nebenkosten:</strong> ${(property.additionalCosts || 0).toLocaleString()} €</p>
-
-<p><strong>Hausgeld:</strong> ${(property.houseFee || 0).toLocaleString()} €</p>
-
-<p><strong>Bruttorendite:</strong> ${
-
-  property.coldRent > 0
-
-    ? ((property.coldRent * 12 / property.price) * 100).toFixed(2)
-
-    : "0.00"
-
-} %</p>
+        <p><strong>Kaltmiete:</strong> ${(property.coldRent || 0).toLocaleString()} €</p>
+        <p><strong>Nebenkosten:</strong> ${(property.additionalCosts || 0).toLocaleString()} €</p>
+        <p><strong>Hausgeld:</strong> ${(property.houseFee || 0).toLocaleString()} €</p>
+        <p><strong>Bruttorendite:</strong> ${yieldValue.toFixed(2)} %</p>
 
         <hr>
 
         <p><strong>Deal-Score:</strong> ${property.dealScore}</p>
         <p><strong>Kaufsignal:</strong> ${property.purchaseSignal}</p>
         <p><strong>Kaufempfehlung:</strong> ${property.recommendation}</p>
-<details>
 
         <details>
           <summary>Warum diese Bewertung?</summary>
           <br>
-
           Preisbewertung: ${
             property.pricePerSqm < 5000
               ? "🟢 sehr gut"
@@ -426,7 +294,6 @@ property.monthlyRate1 <= 800
               ? "🟡 marktgerecht"
               : "🔴 hoch"
           }<br>
-
           Wohnfläche: ${
             property.area >= 30
               ? "🟢 gut nutzbar"
@@ -434,7 +301,6 @@ property.monthlyRate1 <= 800
               ? "🟡 kompakt"
               : "🔴 sehr klein"
           }<br>
-
           Kaufpreis: ${
             property.price <= 150000
               ? "🟢 niedrig"
@@ -442,7 +308,6 @@ property.monthlyRate1 <= 800
               ? "🟡 im Suchrahmen"
               : "🔴 über Wunschbudget"
           }<br>
-
           Risiko-Hinweis: ${
             property.title.toLowerCase().includes("hobbyraum")
               ? "⚠️ Hobbyraum genau prüfen"
@@ -457,46 +322,36 @@ property.monthlyRate1 <= 800
         <details>
           <summary>Investment-Check</summary>
           <br>
-
           Bruttorendite: ${
-            property.coldRent > 0
-              ? (
-                  ((property.coldRent * 12 / property.price) * 100) >= 4
-                    ? "🟢 attraktiv"
-                    : ((property.coldRent * 12 / property.price) * 100) >= 3
-                    ? "🟡 okay"
-                    : "🔴 niedrig"
-                )
+            yieldValue >= 4
+              ? "🟢 attraktiv"
+              : yieldValue >= 3
+              ? "🟡 okay"
+              : yieldValue > 0
+              ? "🔴 niedrig"
               : "nicht berechenbar"
           }<br>
-
           Vermietungsstatus: ${
             property.rentalStatus === "vermietet"
               ? "🟢 bereits vermietet"
               : "🟡 frei / neu vermietbar"
           }<br>
-
           Hausgeld: ${
             property.houseFee > 0
-              ? (
-                  property.houseFee <= 180
-                    ? "🟢 niedrig"
-                    : property.houseFee <= 300
-                    ? "🟡 normal"
-                    : "🔴 hoch"
-                )
+              ? property.houseFee <= 180
+                ? "🟢 niedrig"
+                : property.houseFee <= 300
+                ? "🟡 normal"
+                : "🔴 hoch"
               : "nicht angegeben"
           }<br><br>
-
           Investor-Kaufsignal: ${
-            property.coldRent > 0 &&
-            ((property.coldRent * 12 / property.price) * 100) >= 4
+            yieldValue >= 4
               ? "🟢 Für Kapitalanlage interessant"
               : property.rentalStatus === "frei"
               ? "🟡 Eher Eigennutzung / Neuvermietung prüfen"
               : "🟡 Genau prüfen"
           }<br><br>
-
           Exposé-Checkliste:<br>
           ☐ Energieausweis prüfen<br>
           ☐ Hausgeldabrechnung prüfen<br>
@@ -504,97 +359,61 @@ property.monthlyRate1 <= 800
           ☐ Mietvertrag prüfen<br>
           ☐ Sondernutzung oder Hobbyraum prüfen
         </details>
-<details>
 
-<summary>📍 Lagebewertung</summary>
+        <details>
+          <summary>📍 Lagebewertung</summary>
+          <br>
+          Lage-Score: ${
+            property.location.toLowerCase().includes("schwabing")
+              ? "🟢 Top-Lage"
+              : property.location.toLowerCase().includes("maxvorstadt")
+              ? "🟢 Top-Lage"
+              : property.location.toLowerCase().includes("haidhausen")
+              ? "🟢 Top-Lage"
+              : property.location.toLowerCase().includes("bogenhausen")
+              ? "🟢 Sehr gute Lage"
+              : property.location.toLowerCase().includes("giesing")
+              ? "🟡 Gute Lage"
+              : property.location.toLowerCase().includes("perlach")
+              ? "🟡 Solide Lage"
+              : "⚪ Lage manuell prüfen"
+          }<br><br>
+          Vermietbarkeit: ${
+            property.location.toLowerCase().includes("münchen")
+              ? "🟢 Grundsätzlich sehr gut"
+              : "🟡 Prüfen"
+          }<br><br>
+          Entfernung: ${property.distance ? property.distance + " km" : "nicht angegeben"}
+        </details>
 
-<br>
-
-Lage-Score: ${
-
-  property.location.toLowerCase().includes("schwabing")
-
-    ? "🟢 Top-Lage"
-
-    : property.location.toLowerCase().includes("maxvorstadt")
-
-    ? "🟢 Top-Lage"
-
-    : property.location.toLowerCase().includes("haidhausen")
-
-    ? "🟢 Top-Lage"
-
-    : property.location.toLowerCase().includes("bogenhausen")
-
-    ? "🟢 Sehr gute Lage"
-
-    : property.location.toLowerCase().includes("giesing")
-
-    ? "🟡 Gute Lage"
-
-    : property.location.toLowerCase().includes("perlach")
-
-    ? "🟡 Solide Lage"
-
-    : "⚪ Lage manuell prüfen"
-
-}<br><br>
-
-Vermietbarkeit: ${
-
-  property.location.toLowerCase().includes("münchen")
-
-    ? "🟢 Grundsätzlich sehr gut"
-
-    : "🟡 Prüfen"
-
-}<br><br>
-
-Entfernung: ${
-
-  property.distance
-
-    ? property.distance + " km"
-
-    : "nicht angegeben"
-
-}
-
-</details>
         <details>
           <summary>Risikoanalyse</summary>
           <br>
-
           ${
             property.title.toLowerCase().includes("hobbyraum")
               ? "⚠️ Hobbyraum: Wohnnutzung und Teilungserklärung unbedingt prüfen.<br>"
               : ""
           }
-
           ${
             property.title.toLowerCase().includes("student")
               ? "⚠️ Studentenapartment: Vermietungsbindung, Betreibervertrag und Zielgruppe prüfen.<br>"
               : ""
           }
-
           ${
             property.title.toLowerCase().includes("hotel")
               ? "⚠️ Hotelapartment: Betreiberkonzept, Auslastung und Vertragslaufzeit prüfen.<br>"
               : ""
           }
-
           ${
             property.type && property.type.toLowerCase().includes("garage")
               ? "⚠️ Garage/Stellplatz: Hausgeld, Sonderumlagen, Zufahrt und Vermietbarkeit prüfen.<br>"
               : ""
           }
-
           ${
             property.type && property.type.toLowerCase().includes("haus")
               ? "⚠️ Haus: Dach, Heizung, Fenster, Feuchtigkeit und Sanierungsstand prüfen.<br>"
               : ""
           }
-
           ${
             !property.title.toLowerCase().includes("hobbyraum") &&
             !property.title.toLowerCase().includes("student") &&
@@ -604,8 +423,9 @@ Entfernung: ${
               ? "Keine besonderen Risiken aus Titel oder Objektart erkannt. Unterlagen trotzdem prüfen."
               : ""
           }
-        </details>        
-            <details>
+        </details>
+
+        <details>
           <summary>Kaufnebenkosten</summary>
           <br>
           Kaufpreis: ${property.price.toLocaleString()} €<br>
