@@ -351,7 +351,25 @@ property.pricePerSqm < 7000
 }
 
 </p>
+<p>
 
+🏦 Finanzierungsrisiko:
+
+${
+
+property.monthlyRate1 <= 800
+
+? "🟢 Gut tragbar"
+
+: property.monthlyRate1 <= 1200
+
+? "🟡 Prüfen"
+
+: "🔴 Hohe Belastung"
+
+}
+
+</p>
         <button class="favorite-btn" onclick="toggleFavorite('${property.id}')">
           ${isFavorite ? "⭐ Favorit gespeichert" : "☆ Zu Favoriten hinzufügen"}
         </button>
