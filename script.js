@@ -275,10 +275,36 @@ const properties = apiProperties.map(property => {
         <hr>
 
         <p><strong>Preis:</strong> ${property.price.toLocaleString()} €</p>
-        <p><strong>Wohnfläche:</strong> ${property.area} m²</p>
-        <p><strong>Zimmer:</strong> ${property.rooms}</p>
-        <p><strong>Preis/m²:</strong> ${property.pricePerSqm.toLocaleString()} €/m²</p>
-        <p><strong>Marktvergleich:</strong> ${property.marketText}</p>
+
+<p><strong>Wohnfläche:</strong> ${property.area} m²</p>
+
+<p><strong>Zimmer:</strong> ${property.rooms}</p>
+
+<p><strong>Preis/m²:</strong> ${property.pricePerSqm.toLocaleString()} €/m²</p>
+
+<p><strong>Marktvergleich:</strong> ${property.marketText}</p>
+
+<p><strong>Vermietung:</strong> ${
+
+  property.rentalStatus === "vermietet" ? "🟢 Vermietet" : "🏠 Frei"
+
+}</p>
+
+<p><strong>Kaltmiete:</strong> ${(property.coldRent || 0).toLocaleString()} €</p>
+
+<p><strong>Nebenkosten:</strong> ${(property.additionalCosts || 0).toLocaleString()} €</p>
+
+<p><strong>Hausgeld:</strong> ${(property.houseFee || 0).toLocaleString()} €</p>
+
+<p><strong>Bruttorendite:</strong> ${
+
+  property.coldRent > 0
+
+    ? ((property.coldRent * 12 / property.price) * 100).toFixed(2)
+
+    : "0.00"
+
+} %</p>
 
         <hr>
 
