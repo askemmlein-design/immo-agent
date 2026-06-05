@@ -20,21 +20,63 @@ function toggleFavorite(id) {
 }
 
 function calculateScore(property) {
+
   const pricePerSqm = Math.round(property.price / property.area);
+
   let score = 50;
 
+  const propertyType = (
+
+    property.type ||
+
+    property.title ||
+
+    ""
+
+  ).toLowerCase();
+
+  if (
+
+    propertyType.includes("garage") ||
+
+    propertyType.includes("stellplatz") ||
+
+    propertyType.includes("tiefgarage")
+
+  ) {
+
+    score = 60;
+
+    if (property.price <= 30000) score += 20;
+
+    else if (property.price <= 50000) score += 10;
+
+    if (property.coldRent >= 80) score += 10;
+
+    if (property.coldRent >= 120) score += 10;
+
+    return Math.min(score, 100);
+
+  }
+
   if (pricePerSqm < 5000) score += 30;
+
   else if (pricePerSqm < 7500) score += 20;
+
   else if (pricePerSqm < 10000) score += 10;
+
   else score += 3;
 
   if (property.price <= 150000) score += 15;
+
   else if (property.price <= 200000) score += 10;
 
   if (property.area >= 25) score += 10;
+
   else score += 3;
 
   return Math.min(score, 100);
+
 }
 
 function getYield(property) {
