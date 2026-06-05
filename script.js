@@ -282,6 +282,47 @@ ${
 </p>
 
 <p>
+<p>
+
+📍 Lage:
+${
+  property.location.toLowerCase().includes("schwabing") ||
+  property.location.toLowerCase().includes("maxvorstadt") ||
+  property.location.toLowerCase().includes("haidhausen")
+    ? "🟢"
+    : property.location.toLowerCase().includes("giesing") ||
+      property.location.toLowerCase().includes("perlach")
+    ? "🟡"
+    : "⚪"
+}
+
+&nbsp;&nbsp;
+
+💰 Rendite:
+${
+  property.coldRent > 0 &&
+  ((property.coldRent * 12) / property.price) * 100 >= 5
+    ? "🟢"
+    : property.coldRent > 0 &&
+      ((property.coldRent * 12) / property.price) * 100 >= 3
+    ? "🟡"
+    : "🔴"
+}
+
+&nbsp;&nbsp;
+
+⚠️ Risiko:
+${
+  property.title.toLowerCase().includes("hobbyraum")
+    ? "🔴"
+    : property.title.toLowerCase().includes("hotel")
+    ? "🔴"
+    : property.title.toLowerCase().includes("student")
+    ? "🟡"
+    : "🟢"
+}
+
+</p>
 ${
   property.score >= 90
     ? "✓ Sehr gutes Preis-Leistungs-Verhältnis"
@@ -291,6 +332,24 @@ ${
     ? "✓ Weitere Prüfung notwendig"
     : "✗ Aktuell kein Favorit"
 }
+<p>
+
+📈 Marktchance:
+
+${
+
+property.pricePerSqm < 7000
+
+? "🟢 Stark unter Markt"
+
+: property.pricePerSqm < 9000
+
+? "🟡 Marktgerecht"
+
+: "🔴 Über Markt"
+
+}
+
 </p>
 
         <button class="favorite-btn" onclick="toggleFavorite('${property.id}')">
