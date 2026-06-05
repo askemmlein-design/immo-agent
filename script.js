@@ -313,7 +313,45 @@ const properties = apiProperties.map(property => {
         <p><strong>Kaufempfehlung:</strong> ${property.recommendation}</p>
 <details>
 
-  <summary>Warum diese Bewertung?</summary>
+        <details>
+          <summary>Warum diese Bewertung?</summary>
+          <br>
+
+          Preisbewertung: ${
+            property.pricePerSqm < 5000
+              ? "🟢 sehr gut"
+              : property.pricePerSqm < 7500
+              ? "🟡 marktgerecht"
+              : "🔴 hoch"
+          }<br>
+
+          Wohnfläche: ${
+            property.area >= 30
+              ? "🟢 gut nutzbar"
+              : property.area >= 20
+              ? "🟡 kompakt"
+              : "🔴 sehr klein"
+          }<br>
+
+          Kaufpreis: ${
+            property.price <= 150000
+              ? "🟢 niedrig"
+              : property.price <= 200000
+              ? "🟡 im Suchrahmen"
+              : "🔴 über Wunschbudget"
+          }<br>
+
+          Risiko-Hinweis: ${
+            property.title.toLowerCase().includes("hobbyraum")
+              ? "⚠️ Hobbyraum genau prüfen"
+              : property.title.toLowerCase().includes("hotel")
+              ? "⚠️ Sondernutzung / Hotelkonzept prüfen"
+              : property.title.toLowerCase().includes("student")
+              ? "⚠️ Studentenapartment prüfen"
+              : "keine besonderen Hinweise aus Titel erkannt"
+          }
+        </details>
+
         <details>
           <summary>Investment-Check</summary>
           <br>
@@ -364,69 +402,51 @@ const properties = apiProperties.map(property => {
           ☐ Mietvertrag prüfen<br>
           ☐ Sondernutzung oder Hobbyraum prüfen
         </details>
-  <br>
 
-  Preisbewertung: ${
+        <details>
+          <summary>Risikoanalyse</summary>
+          <br>
 
-    property.pricePerSqm < 5000
+          ${
+            property.title.toLowerCase().includes("hobbyraum")
+              ? "⚠️ Hobbyraum: Wohnnutzung und Teilungserklärung unbedingt prüfen.<br>"
+              : ""
+          }
 
-      ? "🟢 sehr gut"
+          ${
+            property.title.toLowerCase().includes("student")
+              ? "⚠️ Studentenapartment: Vermietungsbindung, Betreibervertrag und Zielgruppe prüfen.<br>"
+              : ""
+          }
 
-      : property.pricePerSqm < 7500
+          ${
+            property.title.toLowerCase().includes("hotel")
+              ? "⚠️ Hotelapartment: Betreiberkonzept, Auslastung und Vertragslaufzeit prüfen.<br>"
+              : ""
+          }
 
-      ? "🟡 marktgerecht"
+          ${
+            property.type && property.type.toLowerCase().includes("garage")
+              ? "⚠️ Garage/Stellplatz: Hausgeld, Sonderumlagen, Zufahrt und Vermietbarkeit prüfen.<br>"
+              : ""
+          }
 
-      : "🔴 hoch"
+          ${
+            property.type && property.type.toLowerCase().includes("haus")
+              ? "⚠️ Haus: Dach, Heizung, Fenster, Feuchtigkeit und Sanierungsstand prüfen.<br>"
+              : ""
+          }
 
-  }<br>
-
-  Wohnfläche: ${
-
-    property.area >= 30
-
-      ? "🟢 gut nutzbar"
-
-      : property.area >= 20
-
-      ? "🟡 kompakt"
-
-      : "🔴 sehr klein"
-
-  }<br>
-
-  Kaufpreis: ${
-
-    property.price <= 150000
-
-      ? "🟢 niedrig"
-
-      : property.price <= 200000
-
-      ? "🟡 im Suchrahmen"
-
-      : "🔴 über Wunschbudget"
-
-  }<br>
-
-  Risiko-Hinweis: ${
-
-    property.title.toLowerCase().includes("hobbyraum")
-
-      ? "⚠️ Hobbyraum genau prüfen"
-
-      : property.title.toLowerCase().includes("hotel")
-
-      ? "⚠️ Sondernutzung / Hotelkonzept prüfen"
-
-      : property.title.toLowerCase().includes("student")
-
-      ? "⚠️ Studentenapartment prüfen"
-
-      : "keine besonderen Hinweise aus Titel erkannt"
-
-  }
-
-</details>        
+          ${
+            !property.title.toLowerCase().includes("hobbyraum") &&
+            !property.title.toLowerCase().includes("student") &&
+            !property.title.toLowerCase().includes("hotel") &&
+            !(property.type && property.type.toLowerCase().includes("garage")) &&
+            !(property.type && property.type.toLowerCase().includes("haus"))
+              ? "Keine besonderen Risiken aus Titel oder Objektart erkannt. Unterlagen trotzdem prüfen."
+              : ""
+          }
+        </details>        
             <details>
           <summary>Kaufnebenkosten</summary>
           <br>
