@@ -359,8 +359,43 @@ async function searchProperties() {
           ☐ Mietvertrag prüfen<br>
           ☐ Sondernutzung oder Hobbyraum prüfen
         </details>
-
         <details>
+
+          <summary>💰 Cashflow Analyse</summary>
+
+          <br>
+
+          Mieteinnahmen kalt: ${(property.coldRent || 0).toLocaleString()} €<br>
+
+          Hausgeld: ${(property.houseFee || 0).toLocaleString()} €<br>
+
+          Finanzierungsrate Beispiel 1: ${property.monthlyRate1.toLocaleString()} €<br><br>
+
+          Monatlicher Cashflow: <strong>${
+
+            ((property.coldRent || 0) - (property.houseFee || 0) - property.monthlyRate1).toLocaleString()
+
+          } €</strong><br><br>
+
+          Bewertung: ${
+
+            ((property.coldRent || 0) - (property.houseFee || 0) - property.monthlyRate1) > 100
+
+              ? "🟢 Positiver Cashflow"
+
+              : ((property.coldRent || 0) - (property.houseFee || 0) - property.monthlyRate1) >= 0
+
+              ? "🟡 Neutral / knapp positiv"
+
+              : "🔴 Negativer Cashflow"
+
+          }<br><br>
+
+          Hinweis: Diese Berechnung ist vereinfacht. Nicht berücksichtigt sind Instandhaltung,
+
+          Leerstand, Steuer, nicht umlagefähige Kosten und Sonderumlagen.
+
+        </details>        <details>
           <summary>📍 Lagebewertung</summary>
           <br>
           Lage-Score: ${
