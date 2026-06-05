@@ -351,7 +351,8 @@ const properties = apiProperties.map(property => {
 
   }
 
-</details>        <details>
+</details>        
+            <details>
           <summary>Kaufnebenkosten</summary>
           <br>
           Kaufpreis: ${property.price.toLocaleString()} €<br>
