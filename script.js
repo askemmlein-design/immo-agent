@@ -437,7 +437,8 @@ async function searchProperties() {
 
           Leerstand, Steuer, nicht umlagefähige Kosten und Sonderumlagen.
 
-        </details>        <details>
+        </details>        
+                <details>
           <summary>📍 Lagebewertung</summary>
           <br>
           Lage-Score: ${
