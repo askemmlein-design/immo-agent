@@ -131,7 +131,7 @@ function calculateScore(property) {
   return Math.min(score, 100);
 }
 
-function searchProperties() {
+async function searchProperties() {
   const results = document.getElementById("results");
   const favorites = getFavorites();
 
@@ -141,7 +141,11 @@ function searchProperties() {
   const repayment2 = Number(document.getElementById("repayment2").value) / 100;
   const equity = Number(document.getElementById("equity").value || 0);
 
-  const properties = realProperties.map(property => {
+  const response = await fetch("/api/search");
+
+const apiProperties = await response.json();
+
+const properties = apiProperties.map(property => {
     const score = calculateScore(property);
     const pricePerSqm = Math.round(property.price / property.area);
     const marketPricePerSqm = 9000;
