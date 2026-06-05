@@ -114,7 +114,59 @@ function getLocationSignal(property) {
 
   return "⚪";
 }
+function getDealBadge(property) {
 
+  const yieldValue = getYield(property);
+
+  const riskSignal = getRiskSignal(property);
+
+  if (
+
+    property.score >= 95 &&
+
+    property.pricePerSqm < 7000 &&
+
+    yieldValue >= 5 &&
+
+    riskSignal !== "🔴"
+
+  ) {
+
+    return "⭐⭐⭐ SCHNÄPPCHEN";
+
+  }
+
+  if (
+
+    property.score >= 90 &&
+
+    property.pricePerSqm < 8000 &&
+
+    yieldValue >= 4 &&
+
+    riskSignal !== "🔴"
+
+  ) {
+
+    return "⭐⭐ PREMIUM DEAL";
+
+  }
+
+  if (
+
+    property.score >= 85 &&
+
+    riskSignal !== "🔴"
+
+  ) {
+
+    return "⭐ TOP DEAL";
+
+  }
+
+  return "";
+
+}
 async function searchProperties() {
   const results = document.getElementById("results");
   const favorites = getFavorites();
@@ -227,9 +279,13 @@ async function searchProperties() {
   properties.forEach((property, index) => {
     const isFavorite = favorites.includes(property.id);
     const yieldValue = getYield(property);
-    const topDeal = property.score >= 95
-      ? "<span style='color:#16a34a;font-weight:bold'>🟢 TOP DEAL</span>"
-      : "";
+    const dealBadge = getDealBadge(property);
+
+const topDeal = dealBadge
+
+  ? `<span style="color:#16a34a;font-weight:bold">${dealBadge}</span>`
+
+  : "";
 
     html += `
       <div class="result ${property.color}">
