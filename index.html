@@ -1,157 +1,340 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ImmoAgent Alpha</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<style>
-body{font-family:Arial,sans-serif;background:#f4f6f8;margin:0;padding:30px}
-.container{max-width:950px;margin:auto}
-.card{background:white;padding:25px;border-radius:16px;box-shadow:0 2px 14px rgba(0,0,0,.12)}
-input,select,textarea,button{width:100%;padding:12px;margin:8px 0 18px;border-radius:8px;border:1px solid #ddd}
-button{background:#2563eb;color:white;font-weight:bold;border:none;cursor:pointer}
-.mode-buttons{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-.mode-buttons button{background:#e5e7eb;color:#111}
-.mode-buttons button.active{background:#2563eb;color:white}
-.box,details{background:#eef2f7;padding:15px;border-radius:12px;margin-top:15px}
-.result{margin-top:18px;padding:18px;border-radius:12px;background:#eef6ff}
-.green{border-left:8px solid #22c55e}
-.yellow{border-left:8px solid #facc15}
-.red{border-left:8px solid #ef4444}
-summary{cursor:pointer;font-weight:bold;font-size:18px}
-.favorite-btn{background:#facc15;color:#111;margin-top:10px}
-.export-btn{background:#16a34a;margin-top:15px}
-.badge{font-weight:bold}
-.small{font-size:14px;color:#555}
-@media(max-width:700px){
-body{padding:16px}
-.mode-buttons{grid-template-columns:1fr}
-}
-</style>
+  <title>Immo-Agent</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
+      margin: 0;
+      padding: 20px;
+      color: #111827;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #6b7280;
+      margin-bottom: 25px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px;
+      margin-top: 6px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+
+    textarea {
+      min-height: 180px;
+      resize: vertical;
+      font-family: Arial, sans-serif;
+    }
+
+    button {
+      margin-top: 16px;
+      padding: 12px 18px;
+      border: none;
+      border-radius: 10px;
+      background: #2563eb;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .secondary-button {
+      background: #374151;
+    }
+
+    .secondary-button:hover {
+      background: #1f2937;
+    }
+
+    .hint {
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .result {
+      background: white;
+      padding: 18px;
+      border-radius: 16px;
+      margin-top: 18px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+    }
+
+    .green {
+      border-left: 8px solid #16a34a;
+    }
+
+    .yellow {
+      border-left: 8px solid #facc15;
+    }
+
+    .red {
+      border-left: 8px solid #dc2626;
+    }
+
+    details {
+      background: #f9fafb;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+    }
+
+    summary {
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .favorite-btn {
+      background: #f59e0b;
+      color: white;
+      width: 100%;
+    }
+
+    .favorite-btn:hover {
+      background: #d97706;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #e5e7eb;
+      margin: 18px 0;
+    }
+
+    a {
+      color: #2563eb;
+      word-break: break-word;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 720px) {
+      .grid-2 {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .grid-3 {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+    }
+  </style>
 </head>
 
 <body>
-<div class="container">
-<div class="card">
+  <div class="container">
+    <h1>🏠 Immo-Agent</h1>
+    <p class="subtitle">
+      Immobilien suchen, bewerten und als Investment oder Eigennutzung prüfen.
+    </p>
 
-<h1>🏡 ImmoAgent Alpha</h1>
-<p>Immobilien bewerten statt nur suchen.</p>
+    <section class="card">
+      <h2>🔍 Immobilien suchen</h2>
 
-<h3>Betriebsart wählen</h3>
+      <p class="hint">
+        Wähle Objektart, Maximalpreis und Radius. Die Bewertung erfolgt aktuell über deine Testdaten-API.
+      </p>
 
-<div class="mode-buttons">
-<button id="autoBtn" class="active" onclick="setMode('auto')">🔍 Automatische Suche</button>
-<button id="linksBtn" onclick="setMode('links')">🔗 Links bewerten</button>
-<button id="textBtn" onclick="setMode('text')">📄 Exposé/Text</button>
-</div>
+      <div class="grid grid-3">
+        <div>
+          <label for="type">Objektart</label>
+          <select id="type">
+            <option value="Wohnung Kauf">Wohnung Kauf</option>
+            <option value="Wohnung Miete">Wohnung Miete</option>
+            <option value="Haus Kauf">Haus Kauf</option>
+            <option value="Haus Miete">Haus Miete</option>
+            <option value="Garage Kauf">Garage Kauf</option>
+            <option value="Garage Miete">Garage Miete</option>
+          </select>
+        </div>
 
-<div id="autoMode">
+        <div>
+          <label for="maxPrice">Maximalpreis</label>
+          <input
+            type="number"
+            id="maxPrice"
+            placeholder="z. B. 200000"
+            value="200000"
+          />
+        </div>
 
-<details open>
-<summary>Suchkriterien</summary>
+        <div>
+          <label for="radius">Radius in km</label>
+          <input
+            type="number"
+            id="radius"
+            placeholder="z. B. 25"
+            value="25"
+          />
+        </div>
+      </div>
 
-<label>Objektart</label>
-<select id="type">
-<option>Wohnung Kauf</option>
-<option>Wohnung Miete</option>
-<option>Haus Kauf</option>
-<option>Haus Miete</option>
-<option>Garage Kauf</option>
-<option>Garage Miete</option>
-</select>
+      <hr>
 
-<label>Maximalpreis (€)</label>
-<input id="maxPrice" type="number" value="200000">
+      <h3>🏦 Finanzierung Beispiel 1</h3>
 
-<label>Suchradius (km)</label>
-<input id="radius" type="number" value="25">
-</details>
+      <div class="grid grid-2">
+        <div>
+          <label for="interest1">Zins Beispiel 1 in %</label>
+          <input
+            type="number"
+            id="interest1"
+            step="0.1"
+            value="3.8"
+          />
+        </div>
 
-<details>
-<summary>Finanzierung</summary>
+        <div>
+          <label for="repayment1">Tilgung Beispiel 1 in %</label>
+          <input
+            type="number"
+            id="repayment1"
+            step="0.1"
+            value="1.0"
+          />
+        </div>
+      </div>
 
-<label>Eigenkapital (€)</label>
-<input id="equity" type="number" value="0">
+      <h3>🏦 Finanzierung Beispiel 2</h3>
 
-<label>Zins Beispiel 1 (%)</label>
-<input id="interest1" type="number" step="0.1" value="3.5">
+      <div class="grid grid-2">
+        <div>
+          <label for="interest2">Zins Beispiel 2 in %</label>
+          <input
+            type="number"
+            id="interest2"
+            step="0.1"
+            value="4.5"
+          />
+        </div>
 
-<label>Tilgung Beispiel 1 (%)</label>
-<input id="repayment1" type="number" step="0.1" value="1.0">
+        <div>
+          <label for="repayment2">Tilgung Beispiel 2 in %</label>
+          <input
+            type="number"
+            id="repayment2"
+            step="0.1"
+            value="2.0"
+          />
+        </div>
+      </div>
 
-<label>Zins Beispiel 2 (%)</label>
-<input id="interest2" type="number" step="0.1" value="4.5">
+      <label for="equity">Eigenkapital</label>
+      <input
+        type="number"
+        id="equity"
+        placeholder="z. B. 0"
+        value="0"
+      />
 
-<label>Tilgung Beispiel 2 (%)</label>
-<input id="repayment2" type="number" step="0.1" value="1.0">
-</details>
+      <button onclick="searchProperties()">
+        Immobilien suchen und bewerten
+      </button>
+    </section>
 
-<button onclick="searchProperties()">Automatisch suchen & bewerten</button>
-</div>
+    <section class="card">
+      <h2>🔗 Variante A: Link bewerten</h2>
 
-<div id="linksMode" style="display:none">
-<details open>
-<summary>Links bewerten</summary>
-<textarea rows="7" placeholder="Hier mehrere ImmoScout-Links einfügen, je Link eine Zeile"></textarea>
-<button>Links auswerten</button>
-</details>
-</div>
+      <p class="hint">
+        Füge hier einen ImmoScout-Link ein. Der Bot erkennt zunächst Quelle und Exposé-ID.
+        Die echten Objektdaten werden in dieser Variante noch nicht automatisch ausgelesen.
+      </p>
 
-<div id="textMode" style="display:none">
-<details open>
-<summary>Exposé oder Text bewerten</summary>
-<textarea rows="10" placeholder="Hier Exposé-Text einfügen"></textarea>
-<button>Text bewerten</button>
-</details>
-</div>
+      <label for="propertyLink">Immobilien-Link</label>
+      <input
+        type="text"
+        id="propertyLink"
+        placeholder="https://www.immobilienscout24.de/expose/..."
+      />
 
-<details>
-<summary>Bewertungslogik</summary>
-<br>
-⭐ 90–100 Punkte = Sofort ansehen<br>
-🟢 80–89 Punkte = Besichtigung empfohlen<br>
-🟡 60–79 Punkte = Prüfen<br>
-🔴 0–59 Punkte = Eher nicht<br><br>
-L = Lage | P = Preis | Z = Zustand | E = Energie | H = Hausgeld | D = Dokumentation | R = Rücklagen
-</details>
+      <button
+        class="secondary-button"
+        onclick="typeof analyzePropertyLink === 'function' ? analyzePropertyLink() : alert('Die Funktion analyzePropertyLink fehlt noch in script.js.')"
+      >
+        Link prüfen
+      </button>
 
-<details>
-<summary>⭐ Meine Favoriten</summary>
-<div id="favoritesList" class="small">
-Noch keine Favoriten gespeichert.
-</div>
-<button class="export-btn" onclick="exportFavorites()">📄 Favoriten als CSV exportieren</button>
-</details>
+      <div id="linkResult"></div>
+    </section>
 
-<details>
-<summary>📅 Suchhistorie</summary>
-<div id="historyList" class="small">
-Noch keine Suchläufe vorhanden.
-</div>
-</details>
+    <section class="card">
+      <h2>📄 Variante B: Exposé-Text bewerten</h2>
 
-<div id="results"></div>
+      <p class="hint">
+        Kopiere hier später den Text aus einem Exposé hinein. Daraus kann der Bot anschließend Preis,
+        Fläche, Miete, Hausgeld, Lage und Risiken erkennen.
+      </p>
 
-</div>
-</div>
+      <label for="exposeText">Exposé-Text</label>
+      <textarea
+        id="exposeText"
+        placeholder="Hier Exposé-Text einfügen, z. B. Kaufpreis, Wohnfläche, Kaltmiete, Hausgeld, Lage..."
+      ></textarea>
 
-<script>
-function setMode(mode){
-document.getElementById("autoMode").style.display="none";
-document.getElementById("linksMode").style.display="none";
-document.getElementById("textMode").style.display="none";
+      <button
+        class="secondary-button"
+        onclick="typeof analyzeExposeText === 'function' ? analyzeExposeText() : alert('Die Textanalyse ist im HTML vorbereitet. Die Funktion analyzeExposeText bauen wir als Nächstes in script.js ein.')"
+      >
+        Exposé-Text bewerten
+      </button>
 
-document.getElementById("autoBtn").classList.remove("active");
-document.getElementById("linksBtn").classList.remove("active");
-document.getElementById("textBtn").classList.remove("active");
+      <div id="textResult"></div>
+    </section>
 
-document.getElementById(mode+"Mode").style.display="block";
-document.getElementById(mode+"Btn").classList.add("active");
-document.getElementById("results").innerHTML="";
-}
-</script>
+    <section class="card">
+      <h2>📊 Ergebnisse</h2>
+      <div id="results">
+        <p class="hint">
+          Noch keine Suche gestartet.
+        </p>
+      </div>
+    </section>
+  </div>
 
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
