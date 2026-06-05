@@ -282,52 +282,64 @@
     </section>
 
     <section class="card">
-      <h2>🔗 Variante A: Link bewerten</h2>
+      <h2>🧪 Zusatzbewertung</h2>
 
       <p class="hint">
-        Füge hier einen ImmoScout-Link ein. Der Bot erkennt zunächst Quelle und Exposé-ID.
-        Die echten Objektdaten werden in dieser Variante noch nicht automatisch ausgelesen.
+        Hier kannst du einzelne Links oder Exposé-Texte prüfen. Beide Bereiche sind eingeklappt, damit die Seite übersichtlich bleibt.
       </p>
 
-      <label for="propertyLink">Immobilien-Link</label>
-      <input
-        type="text"
-        id="propertyLink"
-        placeholder="https://www.immobilienscout24.de/expose/..."
-      />
+      <details>
+        <summary>🔗 Variante A: Link bewerten</summary>
 
-      <button
-        class="secondary-button"
-        onclick="typeof analyzePropertyLink === 'function' ? analyzePropertyLink() : alert('Die Funktion analyzePropertyLink fehlt noch in script.js.')"
-      >
-        Link prüfen
-      </button>
+        <br />
 
-      <div id="linkResult"></div>
-    </section>
+        <p class="hint">
+          Füge hier einen ImmoScout-Link ein. Der Bot erkennt zunächst Quelle und Exposé-ID.
+          Die echten Objektdaten werden in dieser Variante noch nicht automatisch ausgelesen.
+        </p>
 
-    <section class="card">
-      <h2>📄 Variante B: Exposé-Text bewerten</h2>
+        <label for="propertyLink">Immobilien-Link</label>
+        <input
+          type="text"
+          id="propertyLink"
+          placeholder="https://www.immobilienscout24.de/expose/..."
+        />
 
-      <p class="hint">
-        Kopiere hier später den Text aus einem Exposé hinein. Daraus kann der Bot anschließend Preis,
-        Fläche, Miete, Hausgeld, Lage und Risiken erkennen.
-      </p>
+        <button
+          class="secondary-button"
+          onclick="typeof analyzePropertyLink === 'function' ? analyzePropertyLink() : alert('Die Funktion analyzePropertyLink fehlt noch in script.js.')"
+        >
+          Link prüfen
+        </button>
 
-      <label for="exposeText">Exposé-Text</label>
-      <textarea
-        id="exposeText"
-        placeholder="Hier Exposé-Text einfügen, z. B. Kaufpreis, Wohnfläche, Kaltmiete, Hausgeld, Lage..."
-      ></textarea>
+        <div id="linkResult"></div>
+      </details>
 
-      <button
-        class="secondary-button"
-        onclick="typeof analyzeExposeText === 'function' ? analyzeExposeText() : alert('Die Textanalyse ist im HTML vorbereitet. Die Funktion analyzeExposeText bauen wir als Nächstes in script.js ein.')"
-      >
-        Exposé-Text bewerten
-      </button>
+      <details>
+        <summary>📄 Variante B: Exposé-Text bewerten</summary>
 
-      <div id="textResult"></div>
+        <br />
+
+        <p class="hint">
+          Kopiere hier später den Text aus einem Exposé hinein. Daraus kann der Bot anschließend Preis,
+          Fläche, Miete, Hausgeld, Lage und Risiken erkennen.
+        </p>
+
+        <label for="exposeText">Exposé-Text</label>
+        <textarea
+          id="exposeText"
+          placeholder="Hier Exposé-Text einfügen, z. B. Kaufpreis, Wohnfläche, Kaltmiete, Hausgeld, Lage..."
+        ></textarea>
+
+        <button
+          class="secondary-button"
+          onclick="typeof analyzeExposeText === 'function' ? analyzeExposeText() : alert('Die Textanalyse ist im HTML vorbereitet. Die Funktion analyzeExposeText bauen wir als Nächstes in script.js ein.')"
+        >
+          Exposé-Text bewerten
+        </button>
+
+        <div id="textResult"></div>
+      </details>
     </section>
 
     <section class="card">
