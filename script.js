@@ -162,7 +162,9 @@ function getRiskReasons(property) {
 
   return risks;
 
-}function getDealBadge(property) {
+}
+
+function getDealBadge(property) {
 
   const propertyType = (property.type || "").toLowerCase();
 
