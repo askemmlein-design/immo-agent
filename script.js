@@ -460,40 +460,49 @@ const topDeal = dealBadge
         <p><strong>Kaufsignal:</strong> ${property.purchaseSignal}</p>
         <p><strong>Kaufempfehlung:</strong> ${property.recommendation}</p>
 
-        <details>
-          <summary>Warum diese Bewertung?</summary>
-          <br>
-          Preisbewertung: ${
-            property.pricePerSqm < 5000
-              ? "🟢 sehr gut"
-              : property.pricePerSqm < 7500
-              ? "🟡 marktgerecht"
-              : "🔴 hoch"
-          }<br>
-          Wohnfläche: ${
-            property.area >= 30
-              ? "🟢 gut nutzbar"
-              : property.area >= 20
-              ? "🟡 kompakt"
-              : "🔴 sehr klein"
-          }<br>
-          Kaufpreis: ${
-            property.price <= 150000
-              ? "🟢 niedrig"
-              : property.price <= 200000
-              ? "🟡 im Suchrahmen"
-              : "🔴 über Wunschbudget"
-          }<br>
-          Risiko-Hinweis: ${
-            property.title.toLowerCase().includes("hobbyraum")
-              ? "⚠️ Hobbyraum genau prüfen"
-              : property.title.toLowerCase().includes("hotel")
-              ? "⚠️ Sondernutzung / Hotelkonzept prüfen"
-              : property.title.toLowerCase().includes("student")
-              ? "⚠️ Studentenapartment prüfen"
-              : "keine besonderen Hinweise aus Titel erkannt"
-          }
-        </details>
+        <details open>
+
+  <summary>Warum diese Bewertung?</summary>
+
+  <br>
+
+  <strong>Warum positiv?</strong><br>
+
+  ${getPositiveReasons(property).join("<br>")}
+
+  <br><br>
+
+  <strong>Risiken / prüfen:</strong><br>
+
+  ${getRiskReasons(property).join("<br>")}
+
+  <br><br>
+
+  <strong>Klare Empfehlung:</strong><br>
+
+  ${
+
+    property.score >= 90
+
+      ? "🟢 Sehr interessant – sofort Exposé öffnen und Unterlagen prüfen."
+
+      : property.score >= 80
+
+      ? "🟢 Interessant – Besichtigung oder nähere Prüfung sinnvoll."
+
+      : property.score >= 60
+
+      ? "🟡 Genau prüfen – Datenlage und Risiken beachten."
+
+      : "🔴 Eher nicht – nur bei besonderem Grund weiterverfolgen."
+
+  }
+
+  <br><br>
+
+  <strong>Analyse vom:</strong> ${now}
+
+</details>
 
         <details>
           <summary>Investment-Check</summary>
