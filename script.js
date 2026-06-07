@@ -114,7 +114,55 @@ function getLocationSignal(property) {
 
   return "⚪";
 }
-function getDealBadge(property) {
+function getPositiveReasons(property) {
+
+  const reasons = [];
+
+  if (property.pricePerSqm < 7000) reasons.push("✅ Preis pro m² wirkt attraktiv.");
+
+  if (property.price <= 200000) reasons.push("✅ Kaufpreis liegt im gewünschten Rahmen.");
+
+  if (property.area >= 25) reasons.push("✅ Wohnfläche ist brauchbar.");
+
+  if (property.location.toLowerCase().includes("münchen")) reasons.push("✅ Lage grundsätzlich gut vermietbar.");
+
+  if (property.score >= 80) reasons.push("✅ Gesamtbewertung ist positiv.");
+
+  if (reasons.length === 0) {
+
+    reasons.push("ℹ️ Keine klaren Vorteile automatisch erkannt.");
+
+  }
+
+  return reasons;
+
+}
+
+function getRiskReasons(property) {
+
+  const risks = [];
+
+  if (property.pricePerSqm > 9000) risks.push("⚠️ Preis pro m² ist hoch.");
+
+  if (!property.houseFee || property.houseFee === 0) risks.push("⚠️ Hausgeld fehlt oder ist unbekannt.");
+
+  if (!property.coldRent || property.coldRent === 0) risks.push("⚠️ Kaltmiete fehlt oder ist unbekannt.");
+
+  if (property.title.toLowerCase().includes("hobbyraum")) risks.push("⚠️ Hobbyraum: Wohnnutzung unbedingt prüfen.");
+
+  if (property.title.toLowerCase().includes("hotel")) risks.push("⚠️ Hotel-/Sondernutzung genau prüfen.");
+
+  if (property.monthlyRate1 > 1200) risks.push("⚠️ Finanzierungsrate wirkt hoch.");
+
+  if (risks.length === 0) {
+
+    risks.push("✅ Keine besonderen Risiken automatisch erkannt. Unterlagen trotzdem prüfen.");
+
+  }
+
+  return risks;
+
+}function getDealBadge(property) {
 
   const propertyType = (property.type || "").toLowerCase();
 
