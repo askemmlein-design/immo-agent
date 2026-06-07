@@ -705,6 +705,15 @@ const topDeal = dealBadge
       </div>
     `;
   });
+html += `
 
-  results.innerHTML = html;
+  <br>
+
+  <button onclick="window.print()" class="secondary-button">
+
+    📄 Analyse drucken / als PDF speichern
+
+  </button>
+
+`;  results.innerHTML = html;
 }
