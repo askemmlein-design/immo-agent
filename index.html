@@ -181,38 +181,73 @@
       </p>
 
       <div class="grid grid-3">
-        <div>
-          <label for="type">Objektart</label>
-          <select id="type">
-            <option value="Wohnung Kauf">Wohnung Kauf</option>
-            <option value="Wohnung Miete">Wohnung Miete</option>
-            <option value="Haus Kauf">Haus Kauf</option>
-            <option value="Haus Miete">Haus Miete</option>
-            <option value="Garage Kauf">Garage Kauf</option>
-            <option value="Garage Miete">Garage Miete</option>
-          </select>
-        </div>
+       <div class="grid grid-3">
+  <div>
+    <label for="type">Objektart</label>
+    <select id="type">
+      <option value="">Alle Objektarten</option>
+      <option value="Wohnung Kauf">Wohnung Kauf</option>
+      <option value="Wohnung Miete">Wohnung Miete</option>
+      <option value="Haus Kauf">Haus Kauf</option>
+      <option value="Haus Miete">Haus Miete</option>
+      <option value="Garage Kauf">Garage Kauf</option>
+      <option value="Garage Miete">Garage Miete</option>
+    </select>
+  </div>
 
-        <div>
-          <label for="maxPrice">Maximalpreis</label>
-          <input
-            type="number"
-            id="maxPrice"
-            placeholder="z. B. 200000"
-            value="200000"
-          />
-        </div>
+  <div>
+    <label for="maxPrice">Maximalpreis</label>
+    <input
+      type="number"
+      id="maxPrice"
+      placeholder="leer lassen = egal"
+      value=""
+    />
+  </div>
 
-        <div>
-          <label for="radius">Radius in km</label>
-          <input
-            type="number"
-            id="radius"
-            placeholder="z. B. 25"
-            value="25"
-          />
-        </div>
-      </div>
+  <div>
+    <label for="radius">Radius in km</label>
+    <input
+      type="number"
+      id="radius"
+      placeholder="leer lassen = egal"
+      value=""
+    />
+  </div>
+</div>
+
+<div class="grid grid-3">
+  <div>
+    <label for="minArea">Mindestgröße m²</label>
+    <input
+      type="number"
+      id="minArea"
+      placeholder="leer lassen = egal"
+      value=""
+    />
+  </div>
+
+  <div>
+    <label for="maxArea">Maximalgröße m²</label>
+    <input
+      type="number"
+      id="maxArea"
+      placeholder="leer lassen = egal"
+      value=""
+    />
+  </div>
+
+  <div>
+    <label for="minRooms">Mindestzimmer</label>
+    <input
+      type="number"
+      id="minRooms"
+      step="0.5"
+      placeholder="leer lassen = egal"
+      value=""
+    />
+  </div>
+</div>
 
       <details>
         <summary>🏦 Finanzierung anpassen</summary>
