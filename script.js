@@ -1225,3 +1225,182 @@ function analyzePropertyLink() {
   `;
 
 }
+function analyzePropertyLink() {
+
+  const linkInput = document.getElementById("propertyLink");
+
+  const resultBox = document.getElementById("linkResult");
+
+  if (!linkInput || !resultBox) {
+
+    alert("Link-Bewertung konnte nicht gestartet werden. Eingabefeld oder Ergebnisfeld fehlt.");
+
+    return;
+
+  }
+
+  const link = linkInput.value.trim();
+
+  if (!link) {
+
+    resultBox.innerHTML = `
+
+      <p style="color:#dc2626;">
+
+        Bitte zuerst einen Immobilien-Link einfügen.
+
+      </p>
+
+    `;
+
+    return;
+
+  }
+
+  let source = "Unbekannte Quelle";
+
+  let exposeId = "nicht erkannt";
+
+  let sourceSignal = "🟡 Quelle prüfen";
+
+  let recommendation = "Der Link wurde erkannt, aber die Quelle konnte nicht eindeutig zugeordnet werden.";
+
+  if (link.includes("immobilienscout24.de")) {
+
+    source = "ImmoScout24";
+
+    sourceSignal = "🟢 ImmoScout-Link erkannt";
+
+    recommendation = "Link erkannt. Für eine echte Bewertung bitte zusätzlich den Exposé-Text kopieren und in Variante B einfügen.";
+
+    const match = link.match(/expose\/(\d+)/);
+
+    if (match && match[1]) {
+
+      exposeId = match[1];
+
+    }
+
+  }
+
+  if (link.includes("kleinanzeigen.de")) {
+
+    source = "Kleinanzeigen";
+
+    sourceSignal = "🟡 Kleinanzeigen-Link erkannt";
+
+    recommendation = "Kleinanzeigen-Link erkannt. Für die Bewertung bitte den Anzeigentext kopieren und in Variante B einfügen.";
+
+  }
+
+  if (link.includes("immowelt.de")) {
+
+    source = "Immowelt";
+
+    sourceSignal = "🟡 Immowelt-Link erkannt";
+
+    recommendation = "Immowelt-Link erkannt. Für die Bewertung bitte den Exposé-Text kopieren und in Variante B einfügen.";
+
+  }
+
+  resultBox.innerHTML = `
+
+    <div class="result yellow" style="margin-top:15px;">
+
+      <h3>🔗 Link-Bewertung</h3>
+
+      <p><strong>Status:</strong> ${sourceSignal}</p>
+
+      <p><strong>Quelle:</strong> ${source}</p>
+
+      <p><strong>Exposé-ID:</strong> ${exposeId}</p>
+
+      <p>
+
+        <strong>Eingefügter Link:</strong><br>
+
+        <a href="${link}" target="_blank">${link}</a>
+
+      </p>
+
+      <hr>
+
+      <p><strong>Bewertung:</strong></p>
+
+      <p>
+
+        Der Bot kann den Link aktuell erkennen und einordnen.
+
+        Die eigentlichen Objektdaten wie Preis, Fläche, Zimmer, Hausgeld oder Miete werden aus dem Link aber noch nicht automatisch ausgelesen.
+
+      </p>
+
+      <details open>
+
+        <summary>📋 Nächster Schritt</summary>
+
+        <br>
+
+        1. Link öffnen<br>
+
+        2. Exposé-Text kopieren<br>
+
+        3. In Variante B einfügen<br>
+
+        4. Exposé-Text bewerten lassen
+
+      </details>
+
+      <details>
+
+        <summary>⚠️ Hinweis</summary>
+
+        <br>
+
+        Eine automatische Auslesung aus Immobilienportalen ist technisch und rechtlich deutlich anspruchsvoller.
+
+        Für Version 1.0 ist die Kombination aus Link-Erkennung und Textanalyse der sauberste Weg.
+
+      </details>
+
+      <p><strong>Empfehlung:</strong> ${recommendation}</p>
+
+      <button class="secondary-button" onclick="goToExposeTextAnalysis()">
+
+        ➡️ Weiter zur Exposé-Textanalyse
+
+      </button>
+
+    </div>
+
+  `;
+
+}
+
+function goToExposeTextAnalysis() {
+
+  const detailsBox = document.getElementById("exposeTextDetails");
+
+  const textBox = document.getElementById("exposeText");
+
+  if (detailsBox) {
+
+    detailsBox.open = true;
+
+  }
+
+  if (textBox) {
+
+    textBox.scrollIntoView({
+
+      behavior: "smooth",
+
+      block: "center"
+
+    });
+
+    textBox.focus();
+
+  }
+
+}
