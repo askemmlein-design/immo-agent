@@ -326,7 +326,27 @@ results.innerHTML = "<p>Suche läuft...</p>";
     };
   });
 
-  properties.sort((a, b) => b.score - a.score);
+  const filteredProperties = properties.filter(property => {
+
+  const area = Number(property.area || 0);
+
+  const rooms = Number(property.rooms || 0);
+
+  const areaMatches =
+
+    area >= minArea &&
+
+    area <= maxArea;
+
+  const roomsMatches =
+
+    rooms >= minRooms;
+
+  return areaMatches && roomsMatches;
+
+});
+
+filteredProperties.sort((a, b) => b.score - a.score);
 
   const starCount = properties.filter(p => p.score >= 90).length;
   const greenCount = properties.filter(p => p.score >= 80 && p.score < 90).length;
