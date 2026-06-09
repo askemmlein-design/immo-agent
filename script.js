@@ -348,10 +348,13 @@ results.innerHTML = "<p>Suche läuft...</p>";
 
 filteredProperties.sort((a, b) => b.score - a.score);
 
-  const starCount = properties.filter(p => p.score >= 90).length;
-  const greenCount = properties.filter(p => p.score >= 80 && p.score < 90).length;
-  const yellowCount = properties.filter(p => p.score >= 60 && p.score < 80).length;
-  const redCount = properties.filter(p => p.score < 60).length;
+  const starCount = filteredProperties.filter(p => p.score >= 90).length;
+
+const greenCount = filteredProperties.filter(p => p.score >= 80 && p.score < 90).length;
+
+const yellowCount = filteredProperties.filter(p => p.score >= 60 && p.score < 80).length;
+
+const redCount = filteredProperties.filter(p => p.score < 60).length;
   const now = new Date().toLocaleString("de-DE");
 
   let html = `
