@@ -234,9 +234,17 @@ async function searchProperties() {
   const interest2 = Number(document.getElementById("interest2").value) / 100;
   const repayment2 = Number(document.getElementById("repayment2").value) / 100;
   const equity = Number(document.getElementById("equity").value || 0);
-const usage = document.getElementById("usage").value;
+const usageElement = document.getElementById("usage");
 
-const rentPerSqm = Number(document.getElementById("rentPerSqm").value || 0);
+const rentPerSqmElement = document.getElementById("rentPerSqm");
+
+const usage = usageElement ? usageElement.value : "";
+
+const rentPerSqm = rentPerSqmElement
+
+  ? Number(rentPerSqmElement.value || 0)
+
+  : 0;
 
 const maxPrice = document.getElementById("maxPrice").value || 999999999;
 
