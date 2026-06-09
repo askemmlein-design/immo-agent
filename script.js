@@ -370,7 +370,7 @@ const redCount = filteredProperties.filter(p => p.score < 60).length;
     </details>
   `;
 
-  properties.forEach((property, index) => {
+  filteredProperties.forEach((property, index) => {
     const isFavorite = favorites.includes(property.id);
     const yieldValue = getYield(property);
     const dealBadge = getDealBadge(property);
