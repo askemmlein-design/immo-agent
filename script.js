@@ -364,7 +364,7 @@ const redCount = filteredProperties.filter(p => p.score < 60).length;
       <summary>Suchstatistik</summary>
       <br>
       <strong>Suchlauf:</strong> ${now}<br><br>
-      <strong>${properties.length} Treffer</strong><br><br>
+      <strong>${filteredProperties.length} Treffer</strong><br><br>
       ⭐ ${starCount} | 🟢 ${greenCount} | 🟡 ${yellowCount} | 🔴 ${redCount}<br><br>
       <strong>Gespeicherte Favoriten:</strong> ${favorites.length}
     </details>
