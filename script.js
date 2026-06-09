@@ -795,53 +795,121 @@ function analyzeExposeText() {
 
   const lowerText = text.toLowerCase();
 
-  const priceMatch = text.match(/(\d{2,3}(?:[.\s]\d{3})+|\d{5,7})\s*€/);
+  function parseGermanNumber(value) {
 
-  const areaMatch = text.match(/(\d{1,4}(?:[,.]\d{1,2})?)\s*(m²|qm|quadratmeter)/i);
+    if (!value) return 0;
 
-  const roomsMatch = text.match(/(\d{1,2}(?:[,.]\d{1,2})?)\s*(zimmer|zi\.|räume|raum)/i);
+    return Number(
+
+      String(value)
+
+        .replace(/\s/g, "")
+
+        .replace(/\./g, "")
+
+        .replace(",", ".")
+
+    );
+
+  }
+
+  const priceMatch =
+
+    text.match(/(?:kaufpreis|preis|angebotspreis)[^0-9]{0,50}(\d{1,3}(?:[.\s]\d{3})+|\d{4,9})(?:,\d{1,2})?\s*(?:€|eur|euro|e)?/i) ||
+
+    text.match(/(?:€|eur|euro)\s*(\d{1,3}(?:[.\s]\d{3})+|\d{4,9})(?:,\d{1,2})?/i) ||
+
+    text.match(/(\d{1,3}(?:[.\s]\d{3})+|\d{5,9})(?:,\d{1,2})?\s*(?:€|eur|euro|e)/i);
+
+  const areaMatch =
+
+    text.match(/(?:wohnfläche|fläche|nutzfläche|gesamtfläche|objektgröße|größe)[^0-9]{0,50}(\d{1,4}(?:[,.]\d{1,2})?)\s*(?:m²|m2|qm|quadratmeter)/i) ||
+
+    text.match(/(\d{1,4}(?:[,.]\d{1,2})?)\s*(?:m²|m2|qm|quadratmeter)(?!a)/i);
+
+  const roomsMatch =
+
+    text.match(/(?:anzahl\s*zimmer|zimmeranzahl|zimmer|räume|anzahl\s*räume)[^0-9]{0,40}(\d{1,2}(?:[,.]\d{1,2})?)/i) ||
+
+    text.match(/(\d{1,2}(?:[,.]\d{1,2})?)\s*(?:zimmer|zi\.|zi|räume|raum)/i);
 
   const coldRentMatch =
 
-    text.match(/kaltmiete[^0-9]*(\d{2,5}(?:[,.]\d{1,2})?)\s*€/i) ||
-
-    text.match(/nettomiete[^0-9]*(\d{2,5}(?:[,.]\d{1,2})?)\s*€/i);
+    text.match(/(?:kaltmiete|nettokaltmiete|nettomiete|mieteinnahmen kalt|monatliche miete)[^0-9]{0,50}(\d{2,5}(?:[.\s]\d{3})?(?:[,.]\d{1,2})?)\s*(?:€|eur|euro|e)?/i);
 
   const houseFeeMatch =
 
-    text.match(/hausgeld[^0-9]*(\d{2,5}(?:[,.]\d{1,2})?)\s*€/i) ||
+    text.match(/(?:hausgeld|wohngeld|nicht umlagefähige kosten)[^0-9]{0,50}(\d{2,5}(?:[.\s]\d{3})?(?:[,.]\d{1,2})?)\s*(?:€|eur|euro|e)?/i);
 
-    text.match(/wohngeld[^0-9]*(\d{2,5}(?:[,.]\d{1,2})?)\s*€/i);
+  const energyDemandMatch =
+
+    text.match(/(?:endenergiebedarf|energiebedarf)[^0-9]{0,50}(\d{1,4}(?:[,.]\d{1,2})?)/i);
+
+  const energyClassMatch =
+
+    text.match(/energieeffizienzklasse\s*([A-H][+]*)/i);
+
+  const constructionYearMatch =
+
+    text.match(/(?:baujahr|baujahr lt\. energieausweis)[^0-9]{0,40}(\d{4})/i);
+
+  const energyValidUntilMatch =
+
+    text.match(/(?:gültig bis|energieausweis gültig bis)[^0-9]{0,30}(\d{1,2}\.\d{1,2}\.\d{4})/i);
 
   const price = priceMatch
 
-    ? Number(priceMatch[1].replace(/\./g, "").replace(/\s/g, "").replace(",", "."))
+    ? parseGermanNumber(priceMatch[1])
 
     : 0;
 
   const area = areaMatch
 
-    ? Number(areaMatch[1].replace(",", "."))
+    ? parseGermanNumber(areaMatch[1])
 
     : 0;
 
   const rooms = roomsMatch
 
-    ? Number(roomsMatch[1].replace(",", "."))
+    ? parseGermanNumber(roomsMatch[1])
 
     : 0;
 
   const coldRent = coldRentMatch
 
-    ? Number(coldRentMatch[1].replace(/\./g, "").replace(",", "."))
+    ? parseGermanNumber(coldRentMatch[1])
 
     : 0;
 
   const houseFee = houseFeeMatch
 
-    ? Number(houseFeeMatch[1].replace(/\./g, "").replace(",", "."))
+    ? parseGermanNumber(houseFeeMatch[1])
 
     : 0;
+
+  const energyDemand = energyDemandMatch
+
+    ? parseGermanNumber(energyDemandMatch[1])
+
+    : 0;
+
+  const energyClass = energyClassMatch
+
+    ? energyClassMatch[1].toUpperCase()
+
+    : "";
+
+  const constructionYear = constructionYearMatch
+
+    ? constructionYearMatch[1]
+
+    : "";
+
+  const energyValidUntil = energyValidUntilMatch
+
+    ? energyValidUntilMatch[1]
+
+    : "";
 
   const pricePerSqm = price > 0 && area > 0
 
@@ -851,7 +919,7 @@ function analyzeExposeText() {
 
   const grossYield = price > 0 && coldRent > 0
 
-    ? ((coldRent * 12 / price) * 100).toFixed(2)
+    ? ((coldRent * 12 / price) * 100).toFixed(2) + " %"
 
     : "nicht berechenbar";
 
@@ -887,9 +955,21 @@ function analyzeExposeText() {
 
   }
 
+  if (energyClass && ["E", "F", "G", "H"].includes(energyClass)) {
+
+    riskHints.push("⚠️ Energieeffizienzklasse ist eher schwach. Heizkosten und Sanierungsbedarf prüfen.");
+
+  }
+
+  if (constructionYear && Number(constructionYear) < 1980) {
+
+    riskHints.push("⚠️ Älteres Baujahr. Zustand von Heizung, Fenstern, Dach, Leitungen und Fassade prüfen.");
+
+  }
+
   if (riskHints.length === 0) {
 
-    riskHints.push("Keine besonderen Risiken aus dem Text erkannt. Unterlagen trotzdem prüfen.");
+    riskHints.push("✅ Keine besonderen Risiken aus dem Text erkannt. Unterlagen trotzdem prüfen.");
 
   }
 
@@ -897,11 +977,15 @@ function analyzeExposeText() {
 
   let ratingText = "Die Daten reichen für eine erste Einschätzung, aber Unterlagen und Details müssen geprüft werden.";
 
-  if (pricePerSqm > 0 && pricePerSqm < 7000 && riskHints.length <= 1) {
+  let resultColor = "yellow";
+
+  if (pricePerSqm > 0 && pricePerSqm < 7000 && riskHints.length <= 2) {
 
     rating = "🟢 Interessant";
 
     ratingText = "Der Preis pro Quadratmeter wirkt grundsätzlich interessant. Weitere Prüfung lohnt sich.";
+
+    resultColor = "green";
 
   }
 
@@ -919,11 +1003,13 @@ function analyzeExposeText() {
 
     ratingText = "Im Text wurden Punkte erkannt, die vor einer Entscheidung unbedingt geprüft werden sollten.";
 
+    resultColor = "red";
+
   }
 
   resultBox.innerHTML = `
 
-    <div class="result yellow" style="margin-top:15px;">
+    <div class="result ${resultColor}" style="margin-top:15px;">
 
       <h3>📄 Exposé-Text Analyse</h3>
 
@@ -933,21 +1019,31 @@ function analyzeExposeText() {
 
       <hr>
 
-      <p><strong>Erkannter Preis:</strong> ${price > 0 ? price.toLocaleString() + " €" : "nicht erkannt"}</p>
+      <p><strong>Erkannter Preis:</strong> ${price > 0 ? price.toLocaleString("de-DE") + " €" : "nicht erkannt"}</p>
 
-      <p><strong>Erkannte Fläche:</strong> ${area > 0 ? area + " m²" : "nicht erkannt"}</p>
+      <p><strong>Erkannte Fläche:</strong> ${area > 0 ? area.toLocaleString("de-DE") + " m²" : "nicht erkannt"}</p>
 
-      <p><strong>Erkannte Zimmer:</strong> ${rooms > 0 ? rooms : "nicht erkannt"}</p>
+      <p><strong>Erkannte Zimmer:</strong> ${rooms > 0 ? rooms.toLocaleString("de-DE") : "nicht erkannt"}</p>
 
-      <p><strong>Preis/m²:</strong> ${pricePerSqm > 0 ? pricePerSqm.toLocaleString() + " €/m²" : "nicht berechenbar"}</p>
+      <p><strong>Preis/m²:</strong> ${pricePerSqm > 0 ? pricePerSqm.toLocaleString("de-DE") + " €/m²" : "nicht berechenbar"}</p>
 
       <hr>
 
-      <p><strong>Kaltmiete:</strong> ${coldRent > 0 ? coldRent.toLocaleString() + " €" : "nicht erkannt"}</p>
+      <p><strong>Kaltmiete:</strong> ${coldRent > 0 ? coldRent.toLocaleString("de-DE") + " €" : "nicht erkannt"}</p>
 
-      <p><strong>Hausgeld:</strong> ${houseFee > 0 ? houseFee.toLocaleString() + " €" : "nicht erkannt"}</p>
+      <p><strong>Hausgeld:</strong> ${houseFee > 0 ? houseFee.toLocaleString("de-DE") + " €" : "nicht erkannt"}</p>
 
       <p><strong>Bruttorendite:</strong> ${grossYield}</p>
+
+      <hr>
+
+      <p><strong>Endenergiebedarf:</strong> ${energyDemand > 0 ? energyDemand.toLocaleString("de-DE") + " kWh/(m²a)" : "nicht erkannt"}</p>
+
+      <p><strong>Energieeffizienzklasse:</strong> ${energyClass ? energyClass : "nicht erkannt"}</p>
+
+      <p><strong>Baujahr laut Text:</strong> ${constructionYear ? constructionYear : "nicht erkannt"}</p>
+
+      <p><strong>Energieausweis gültig bis:</strong> ${energyValidUntil ? energyValidUntil : "nicht erkannt"}</p>
 
       <details open>
 
