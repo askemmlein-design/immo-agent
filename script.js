@@ -234,12 +234,25 @@ async function searchProperties() {
   const interest2 = Number(document.getElementById("interest2").value) / 100;
   const repayment2 = Number(document.getElementById("repayment2").value) / 100;
   const equity = Number(document.getElementById("equity").value || 0);
+const usage = document.getElementById("usage").value;
 
-  const maxPrice = document.getElementById("maxPrice").value || 999999999;
-  const type = encodeURIComponent(document.getElementById("type").value);
-  const radius = document.getElementById("radius").value || 999;
+const rentPerSqm = Number(document.getElementById("rentPerSqm").value || 0);
 
-  results.innerHTML = "<p>Suche läuft...</p>";
+const maxPrice = document.getElementById("maxPrice").value || 999999999;
+
+const selectedType = document.getElementById("type").value;
+
+const type = encodeURIComponent(selectedType);
+
+const radius = document.getElementById("radius").value || 999;
+
+const minArea = Number(document.getElementById("minArea").value || 0);
+
+const maxArea = Number(document.getElementById("maxArea").value || 999999);
+
+const minRooms = Number(document.getElementById("minRooms").value || 0);
+
+results.innerHTML = "<p>Suche läuft...</p>";
 
   const response = await fetch(`/api/search?maxPrice=${maxPrice}&type=${type}&radius=${radius}`);
   const apiProperties = await response.json();
