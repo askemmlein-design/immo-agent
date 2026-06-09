@@ -753,3 +753,226 @@ html += `
 
 `;  results.innerHTML = html;
 }
+function analyzeExposeText() {
+
+  const textInput = document.getElementById("exposeText");
+
+  const resultBox = document.getElementById("textResult");
+
+  if (!textInput || !resultBox) {
+
+    alert("Textanalyse konnte nicht gestartet werden. Eingabefeld oder Ergebnisfeld fehlt.");
+
+    return;
+
+  }
+
+  const text = textInput.value.trim();
+
+  if (!text) {
+
+    resultBox.innerHTML = `
+
+      <p style="color:#dc2626;">
+
+        Bitte zuerst einen Exposé-Text einfügen.
+
+      </p>
+
+    `;
+
+    return;
+
+  }
+
+  const lowerText = text.toLowerCase();
+
+  const priceMatch = text.match(/(\d{2,3}(?:[.\s]\d{3})+|\d{5,7})\s*€/);
+
+  const areaMatch = text.match(/(\d{1,4}(?:[,.]\d{1,2})?)\s*(m²|qm|quadratmeter)/i);
+
+  const roomsMatch = text.match(/(\d{1,2}(?:[,.]\d{1,2})?)\s*(zimmer|zi\.|räume|raum)/i);
+
+  const coldRentMatch =
+
+    text.match(/kaltmiete[^0-9]*(\d{2,5}(?:[,.]\d{1,2})?)\s*€/i) ||
+
+    text.match(/nettomiete[^0-9]*(\d{2,5}(?:[,.]\d{1,2})?)\s*€/i);
+
+  const houseFeeMatch =
+
+    text.match(/hausgeld[^0-9]*(\d{2,5}(?:[,.]\d{1,2})?)\s*€/i) ||
+
+    text.match(/wohngeld[^0-9]*(\d{2,5}(?:[,.]\d{1,2})?)\s*€/i);
+
+  const price = priceMatch
+
+    ? Number(priceMatch[1].replace(/\./g, "").replace(/\s/g, "").replace(",", "."))
+
+    : 0;
+
+  const area = areaMatch
+
+    ? Number(areaMatch[1].replace(",", "."))
+
+    : 0;
+
+  const rooms = roomsMatch
+
+    ? Number(roomsMatch[1].replace(",", "."))
+
+    : 0;
+
+  const coldRent = coldRentMatch
+
+    ? Number(coldRentMatch[1].replace(/\./g, "").replace(",", "."))
+
+    : 0;
+
+  const houseFee = houseFeeMatch
+
+    ? Number(houseFeeMatch[1].replace(/\./g, "").replace(",", "."))
+
+    : 0;
+
+  const pricePerSqm = price > 0 && area > 0
+
+    ? Math.round(price / area)
+
+    : 0;
+
+  const grossYield = price > 0 && coldRent > 0
+
+    ? ((coldRent * 12 / price) * 100).toFixed(2)
+
+    : "nicht berechenbar";
+
+  let riskHints = [];
+
+  if (lowerText.includes("hobbyraum")) {
+
+    riskHints.push("⚠️ Hobbyraum: Wohnnutzung, Teilungserklärung und Nutzungsart genau prüfen.");
+
+  }
+
+  if (lowerText.includes("hotelapartment") || lowerText.includes("hotel apartment")) {
+
+    riskHints.push("⚠️ Hotelapartment: Betreibervertrag, Auslastung und Laufzeit prüfen.");
+
+  }
+
+  if (lowerText.includes("studentenapartment") || lowerText.includes("student")) {
+
+    riskHints.push("⚠️ Studentenapartment: Vermietbarkeit, Zielgruppe und mögliche Bindungen prüfen.");
+
+  }
+
+  if (lowerText.includes("erbpacht")) {
+
+    riskHints.push("⚠️ Erbpacht: Laufzeit, Erbbauzins und Verlängerung prüfen.");
+
+  }
+
+  if (lowerText.includes("sanierungsbedürftig") || lowerText.includes("renovierungsbedürftig")) {
+
+    riskHints.push("⚠️ Zustand: Sanierungs- oder Renovierungskosten einplanen.");
+
+  }
+
+  if (riskHints.length === 0) {
+
+    riskHints.push("Keine besonderen Risiken aus dem Text erkannt. Unterlagen trotzdem prüfen.");
+
+  }
+
+  let rating = "🟡 Prüfen";
+
+  let ratingText = "Die Daten reichen für eine erste Einschätzung, aber Unterlagen und Details müssen geprüft werden.";
+
+  if (pricePerSqm > 0 && pricePerSqm < 7000 && riskHints.length <= 1) {
+
+    rating = "🟢 Interessant";
+
+    ratingText = "Der Preis pro Quadratmeter wirkt grundsätzlich interessant. Weitere Prüfung lohnt sich.";
+
+  }
+
+  if (
+
+    lowerText.includes("hobbyraum") ||
+
+    lowerText.includes("hotelapartment") ||
+
+    lowerText.includes("erbpacht")
+
+  ) {
+
+    rating = "🔴 Kritisch prüfen";
+
+    ratingText = "Im Text wurden Punkte erkannt, die vor einer Entscheidung unbedingt geprüft werden sollten.";
+
+  }
+
+  resultBox.innerHTML = `
+
+    <div class="result yellow" style="margin-top:15px;">
+
+      <h3>📄 Exposé-Text Analyse</h3>
+
+      <p><strong>Ergebnis:</strong> ${rating}</p>
+
+      <p>${ratingText}</p>
+
+      <hr>
+
+      <p><strong>Erkannter Preis:</strong> ${price > 0 ? price.toLocaleString() + " €" : "nicht erkannt"}</p>
+
+      <p><strong>Erkannte Fläche:</strong> ${area > 0 ? area + " m²" : "nicht erkannt"}</p>
+
+      <p><strong>Erkannte Zimmer:</strong> ${rooms > 0 ? rooms : "nicht erkannt"}</p>
+
+      <p><strong>Preis/m²:</strong> ${pricePerSqm > 0 ? pricePerSqm.toLocaleString() + " €/m²" : "nicht berechenbar"}</p>
+
+      <hr>
+
+      <p><strong>Kaltmiete:</strong> ${coldRent > 0 ? coldRent.toLocaleString() + " €" : "nicht erkannt"}</p>
+
+      <p><strong>Hausgeld:</strong> ${houseFee > 0 ? houseFee.toLocaleString() + " €" : "nicht erkannt"}</p>
+
+      <p><strong>Bruttorendite:</strong> ${grossYield}</p>
+
+      <details open>
+
+        <summary>⚠️ Risiko-Hinweise</summary>
+
+        <br>
+
+        ${riskHints.map(hint => `${hint}<br><br>`).join("")}
+
+      </details>
+
+      <details>
+
+        <summary>📋 Nächste Prüfung</summary>
+
+        <br>
+
+        ☐ Energieausweis prüfen<br>
+
+        ☐ Hausgeldabrechnung prüfen<br>
+
+        ☐ Rücklagen / WEG-Protokolle prüfen<br>
+
+        ☐ Mietvertrag prüfen, falls vermietet<br>
+
+        ☐ Teilungserklärung prüfen<br>
+
+        ☐ Sondernutzung / Hobbyraum / Erbpacht prüfen, falls vorhanden
+
+      </details>
+
+    </div>
+
+  `;
+
+}
