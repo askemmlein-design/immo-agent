@@ -504,7 +504,8 @@ const topDeal = dealBadge
           property.rentalStatus === "vermietet" ? "🟢 Vermietet" : "🏠 Frei"
         }</p>
 
-        <p><strong>Kaltmiete:</strong> ${(property.coldRent || 0).toLocaleString()} €</p>
+        <p><strong>Kaltmiete:</strong> ${(property.effectiveColdRent || 0).toLocaleString()} €</p>
+        <p><strong>Mietquelle:</strong> ${property.rentSource}</p>
         <p><strong>Nebenkosten:</strong> ${(property.additionalCosts || 0).toLocaleString()} €</p>
         <p><strong>Hausgeld:</strong> ${(property.houseFee || 0).toLocaleString()} €</p>
         ${
