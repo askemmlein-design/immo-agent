@@ -21,7 +21,12 @@ function toggleFavorite(id) {
 
 function calculateScore(property) {
 
-  const pricePerSqm = Math.round(property.price / property.area);
+  const price = Number(property.price || 0);
+const area = Number(property.area || 0);
+
+const pricePerSqm = area > 0
+  ? Math.round(price / area)
+  : 999999;
 
   let score = 50;
 
