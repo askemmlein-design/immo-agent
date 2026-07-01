@@ -645,11 +645,11 @@ const topDeal = dealBadge
 
           Bewertung: ${
 
-            ((property.coldRent || 0) - (property.houseFee || 0) - property.monthlyRate1) > 100
+            ((property.effectiveColdRent || 0) - (property.houseFee || 0) - property.monthlyRate1) > 100
 
               ? "🟢 Positiver Cashflow"
 
-              : ((property.coldRent || 0) - (property.houseFee || 0) - property.monthlyRate1) >= 0
+              : ((property.effectiveColdRent || 0) - (property.houseFee || 0) - property.monthlyRate1) >= 0
 
               ? "🟡 Neutral / knapp positiv"
 
