@@ -264,6 +264,7 @@ results.innerHTML = "<p>Suche läuft...</p>";
 
   const response = await fetch(`/api/search?maxPrice=${maxPrice}&type=${type}&radius=${radius}`);
   const apiProperties = await response.json();
+  
   const properties = apiProperties.map(property => {
     const score = calculateScore(property);
     const pricePerSqm = Math.round(property.price / property.area);
