@@ -630,7 +630,8 @@ const topDeal = dealBadge
 
           <br>
 
-          Mieteinnahmen kalt: ${(property.coldRent || 0).toLocaleString()} €<br>
+          Mieteinnahmen kalt: ${(property.effectiveColdRent || 0).toLocaleString()} €<br>
+          Mietquelle: ${property.rentSource}<br>
 
           Hausgeld: ${(property.houseFee || 0).toLocaleString()} €<br>
 
