@@ -270,8 +270,23 @@ const properties = apiProperties.map(property => {
     const pricePerSqm = Math.round(property.price / property.area);
     const marketPricePerSqm = 9000;
     const marketDiff = Math.round(((pricePerSqm - marketPricePerSqm) / marketPricePerSqm) * 100);
+const isPurchaseObject = property.type && property.type.toLowerCase().includes("kauf");
+const isRentalObject = property.type && property.type.toLowerCase().includes("miete");
+const isCapitalInvestment = usage === "kapitalanlage";
 
-    let color = "yellow";
+let effectiveColdRent = property.coldRent || 0;
+let rentSource = "angegebene Kaltmiete";
+
+if (
+  isCapitalInvestment &&
+  isPurchaseObject &&
+  effectiveColdRent <= 0 &&
+  rentPerSqm > 0 &&
+  property.area > 0
+) {
+  effectiveColdRent = Math.round(property.area * rentPerSqm);
+  rentSource = "geschätzte Kaltmiete";
+}    let color = "yellow";
     let status = "🟡 Prüfen";
     let dealScore = "🟡 Marktgerecht";
     let purchaseSignal = "🟡 Prüfen";
