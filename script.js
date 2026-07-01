@@ -146,7 +146,7 @@ function getRiskReasons(property) {
 
   if (!property.houseFee || property.houseFee === 0) risks.push("⚠️ Hausgeld fehlt oder ist unbekannt.");
 
-  if (!property.coldRent || property.coldRent === 0) risks.push("⚠️ Kaltmiete fehlt oder ist unbekannt.");
+  if (!property.effectiveColdRent || property.effectiveColdRent === 0) risks.push("⚠️ Kaltmiete fehlt oder ist unbekannt.");
 
   if (property.title.toLowerCase().includes("hobbyraum")) risks.push("⚠️ Hobbyraum: Wohnnutzung unbedingt prüfen.");
 
