@@ -639,7 +639,7 @@ const topDeal = dealBadge
 
           Monatlicher Cashflow: <strong>${
 
-            ((property.coldRent || 0) - (property.houseFee || 0) - property.monthlyRate1).toLocaleString()
+            ((property.effectiveColdRent || 0) - (property.houseFee || 0) - property.monthlyRate1).toLocaleString()
 
           } €</strong><br><br>
 
