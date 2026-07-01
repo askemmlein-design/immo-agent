@@ -80,8 +80,11 @@ function calculateScore(property) {
 }
 
 function getYield(property) {
-  if (!property.coldRent || property.coldRent <= 0 || !property.price) return 0;
-  return (property.coldRent * 12 / property.price) * 100;
+  const rent = property.effectiveColdRent || property.coldRent || 0;
+
+  if (!rent || rent <= 0 || !property.price) return 0;
+
+  return (rent * 12 / property.price) * 100;
 }
 
 function getRiskSignal(property) {
