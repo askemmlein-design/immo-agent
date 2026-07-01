@@ -336,6 +336,8 @@ if (
       recommendation,
       pricePerSqm,
       marketText,
+      effectiveColdRent,
+      rentSource,
       tax,
       notary,
       landRegister,
