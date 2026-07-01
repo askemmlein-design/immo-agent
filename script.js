@@ -280,8 +280,21 @@ const properties = apiProperties.map(property => {
   : 0;
     const marketPricePerSqm = 9000;
     const marketDiff = Math.round(((pricePerSqm - marketPricePerSqm) / marketPricePerSqm) * 100);
-const isPurchaseObject = property.type && property.type.toLowerCase().includes("kauf");
-const isRentalObject = property.type && property.type.toLowerCase().includes("miete");
+const typeText = (
+  property.type ||
+  property.title ||
+  ""
+).toLowerCase();
+
+const isPurchaseObject =
+  typeText.includes("kauf") ||
+  typeText.includes("wohnung") ||
+  typeText.includes("haus") ||
+  typeText.includes("apartment");
+
+const isRentalObject =
+  typeText.includes("miete");
+  
 const isCapitalInvestment = usage === "kapitalanlage";
 
 let effectiveColdRent = property.coldRent || 0;
