@@ -312,24 +312,33 @@
         </button>
 
         <div id="textResult"></div>
-      </details>
-      <details>
-        <summary>🏦 Finanzierung anpassen</summary>
-<label>Nutzung</label>
+</details>
 
-<select id="usage">
+<h3>Bewertungsart</h3>
 
-  <option value="eigennutzung">Eigennutzung</option>
+<div class="grid grid-2">
+  <div>
+    <label for="usage">Nutzung</label>
+    <select id="usage">
+      <option value="kapitalanlage" selected>Kapitalanlage / Vermietung</option>
+      <option value="eigennutzung">Eigennutzung</option>
+    </select>
+  </div>
 
-  <option value="kapitalanlage">Kapitalanlage / Vermietung</option>
+  <div>
+    <label for="rentPerSqm">Ortsübliche Miete €/m²</label>
+    <input id="rentPerSqm" type="number" value="20" step="1">
+  </div>
+</div>
 
-</select>
+<br />
 
-<label>Ortübliche Miete €/m²</label>
+<details>
+  <summary>🏦 Finanzierung anpassen</summary>
 
-<input id="rentPerSqm" type="number" value="20">        <br />
+  <br />
 
-        <h3>Finanzierung Beispiel 1</h3>
+  <h3>Finanzierung Beispiel 1</h3>
 
         <div class="grid grid-2">
           <div>
