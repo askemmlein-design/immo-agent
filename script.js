@@ -103,7 +103,7 @@ function getRiskSignal(property) {
 }
 
 function getLocationSignal(property) {
-  const location = property.location.toLowerCase();
+  const location = (property.location || "").toLowerCase();
 
   if (
     location.includes("schwabing") ||
