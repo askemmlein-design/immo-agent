@@ -91,6 +91,15 @@ function getYield(property) {
 
   return (rent * 12 / property.price) * 100;
 }
+function getRiskSignal(property) {
+  const title = (property.title || "").toLowerCase();
+
+  if (title.includes("hobbyraum")) return "🔴";
+  if (title.includes("hotel")) return "🔴";
+  if (title.includes("student")) return "🟡";
+
+  return "🟢";
+}
 
 function getRiskReasons(property) {
 
