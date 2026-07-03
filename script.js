@@ -93,7 +93,7 @@ function getYield(property) {
 }
 
 function getRiskSignal(property) {
-  const title = property.title.toLowerCase();
+  const title = (property.title || "").toLowerCase();
 
   if (title.includes("hobbyraum")) return "🔴";
   if (title.includes("hotel")) return "🔴";
