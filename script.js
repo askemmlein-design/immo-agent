@@ -132,7 +132,7 @@ function getPositiveReasons(property) {
 
   if (property.area >= 25) reasons.push("✅ Wohnfläche ist brauchbar.");
 
-  if (property.location.toLowerCase().includes("münchen")) reasons.push("✅ Lage grundsätzlich gut vermietbar.");
+  if ((property.location || "").toLowerCase().includes("münchen")) reasons.push("✅ Lage grundsätzlich gut vermietbar.");
 
   if (property.score >= 80) reasons.push("✅ Gesamtbewertung ist positiv.");
 
