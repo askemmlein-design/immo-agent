@@ -419,10 +419,12 @@ const redCount = filteredProperties.filter(p => p.score < 60).length;
     </details>
   `;
 
-  filteredProperties.forEach((property, index) => {
-    const isFavorite = favorites.includes(property.id);
-    const yieldValue = getYield(property);
-    const dealBadge = getDealBadge(property);
+  ffilteredProperties.forEach((property, index) => {
+  const isFavorite = favorites.includes(property.id);
+  const yieldValue = getYield(property);
+  const dealBadge = getDealBadge(property);
+  const safeTitle = (property.title || "").toLowerCase();
+  const safeLocation = (property.location || "").toLowerCase();
 
 const topDeal = dealBadge
 
