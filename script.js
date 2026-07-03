@@ -91,6 +91,7 @@ function getYield(property) {
 
   return (rent * 12 / property.price) * 100;
 }
+
 function getRiskSignal(property) {
   const title = (property.title || "").toLowerCase();
 
