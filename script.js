@@ -164,32 +164,6 @@ function getPositiveReasons(property) {
 
 }
 
-function getRiskReasons(property) {
-
-  const risks = [];
-
-  if (property.pricePerSqm > 9000) risks.push("⚠️ Preis pro m² ist hoch.");
-
-  if (!property.houseFee || property.houseFee === 0) risks.push("⚠️ Hausgeld fehlt oder ist unbekannt.");
-
-  if (!property.effectiveColdRent || property.effectiveColdRent === 0) risks.push("⚠️ Kaltmiete fehlt oder ist unbekannt.");
-
-  if (title.includes("hobbyraum")) risks.push("⚠️ Hobbyraum: Wohnnutzung unbedingt prüfen.");
-
-  if (title.includes("hotel")) risks.push("⚠️ Hotel-/Sondernutzung genau prüfen.");
-
-  if (property.monthlyRate1 > 1200) risks.push("⚠️ Finanzierungsrate wirkt hoch.");
-
-  if (risks.length === 0) {
-
-    risks.push("✅ Keine besonderen Risiken automatisch erkannt. Unterlagen trotzdem prüfen.");
-
-  }
-
-  return risks;
-
-}
-
 function getDealBadge(property) {
 
   const propertyType = (property.type || "").toLowerCase();
