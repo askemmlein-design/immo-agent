@@ -730,43 +730,43 @@ const topDeal = dealBadge
         </details>
 
         <details>
-          <summary>Risikoanalyse</summary>
-          <br>
-          ${
-            property.title.toLowerCase().includes("hobbyraum")
-              ? "⚠️ Hobbyraum: Wohnnutzung und Teilungserklärung unbedingt prüfen.<br>"
-              : ""
-          }
-          ${
-            property.title.toLowerCase().includes("student")
-              ? "⚠️ Studentenapartment: Vermietungsbindung, Betreibervertrag und Zielgruppe prüfen.<br>"
-              : ""
-          }
-          ${
-            property.title.toLowerCase().includes("hotel")
-              ? "⚠️ Hotelapartment: Betreiberkonzept, Auslastung und Vertragslaufzeit prüfen.<br>"
-              : ""
-          }
-          ${
-            property.type && property.type.toLowerCase().includes("garage")
-              ? "⚠️ Garage/Stellplatz: Hausgeld, Sonderumlagen, Zufahrt und Vermietbarkeit prüfen.<br>"
-              : ""
-          }
-          ${
-            property.type && property.type.toLowerCase().includes("haus")
-              ? "⚠️ Haus: Dach, Heizung, Fenster, Feuchtigkeit und Sanierungsstand prüfen.<br>"
-              : ""
-          }
-          ${
-            !property.title.toLowerCase().includes("hobbyraum") &&
-            !property.title.toLowerCase().includes("student") &&
-            !property.title.toLowerCase().includes("hotel") &&
-            !(property.type && property.type.toLowerCase().includes("garage")) &&
-            !(property.type && property.type.toLowerCase().includes("haus"))
-              ? "Keine besonderen Risiken aus Titel oder Objektart erkannt. Unterlagen trotzdem prüfen."
-              : ""
-          }
-        </details>
+  <summary>Risikoanalyse</summary>
+  <br>
+  ${
+    safeTitle.includes("hobbyraum")
+      ? "⚠️ Hobbyraum: Wohnnutzung und Teilungserklärung unbedingt prüfen.<br>"
+      : ""
+  }
+  ${
+    safeTitle.includes("student")
+      ? "⚠️ Studentenapartment: Vermietungsbindung, Betreibervertrag und Zielgruppe prüfen.<br>"
+      : ""
+  }
+  ${
+    safeTitle.includes("hotel")
+      ? "⚠️ Hotelapartment: Betreiberkonzept, Auslastung und Vertragslaufzeit prüfen.<br>"
+      : ""
+  }
+  ${
+    property.type && property.type.toLowerCase().includes("garage")
+      ? "⚠️ Garage/Stellplatz: Hausgeld, Sonderumlagen, Zufahrt und Vermietbarkeit prüfen.<br>"
+      : ""
+  }
+  ${
+    property.type && property.type.toLowerCase().includes("haus")
+      ? "⚠️ Haus: Dach, Heizung, Fenster, Feuchtigkeit und Sanierungsstand prüfen.<br>"
+      : ""
+  }
+  ${
+    !safeTitle.includes("hobbyraum") &&
+    !safeTitle.includes("student") &&
+    !safeTitle.includes("hotel") &&
+    !(property.type && property.type.toLowerCase().includes("garage")) &&
+    !(property.type && property.type.toLowerCase().includes("haus"))
+      ? "Keine besonderen Risiken aus Titel oder Objektart erkannt. Unterlagen trotzdem prüfen."
+      : ""
+  }
+</details>
 
         <details>
           <summary>Kaufnebenkosten</summary>
