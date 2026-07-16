@@ -782,9 +782,13 @@
 
 
     <section class="card" id="objectArchiveSection">
-      <h2>📁 Objektakte & meine Immobilien</h2>
+      <details id="objectArchiveDetails">
+        <summary style="font-size: 1.5em; font-weight: bold;">
+          📁 Objektakte & meine Immobilien
+        </summary>
 
-      <p class="hint">
+        <div style="margin-top: 16px;">
+          <p class="hint">
         Speichere die aktuelle Immobilie mit Bewertung, Link, Notizen und Status. Alle Daten bleiben lokal auf diesem Gerät.
       </p>
 
@@ -824,8 +828,10 @@
         <button class="orange-button" onclick="showPropertyComparison()">Ausgewählte vergleichen</button>
       </div>
 
-      <div id="propertyComparison"></div>
-      <div id="savedProperties" class="object-list"></div>
+          <div id="propertyComparison"></div>
+          <div id="savedProperties" class="object-list"></div>
+        </div>
+      </details>
     </section>
 
 
