@@ -316,6 +316,131 @@
       border: 1px solid #fde68a;
     }
 
+
+    .object-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .object-toolbar button {
+      flex: 1 1 180px;
+    }
+
+    .object-list {
+      display: grid;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .object-card {
+      border: 1px solid #d1d5db;
+      border-radius: 14px;
+      padding: 16px;
+      background: #ffffff;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    }
+
+    .object-card.favorite {
+      border: 2px solid #f59e0b;
+      background: #fffbeb;
+    }
+
+    .object-card-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .object-card h3 {
+      margin: 0 0 6px 0;
+    }
+
+    .object-meta {
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-right: 6px;
+      margin-top: 6px;
+    }
+
+    .badge-blue { background: #dbeafe; color: #1d4ed8; }
+    .badge-green { background: #dcfce7; color: #166534; }
+    .badge-yellow { background: #fef3c7; color: #92400e; }
+    .badge-red { background: #fee2e2; color: #991b1b; }
+    .badge-gray { background: #e5e7eb; color: #374151; }
+
+    .object-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .object-actions button {
+      margin-top: 0;
+      padding: 9px 12px;
+      font-size: 14px;
+    }
+
+    .danger-button {
+      background: #dc2626;
+    }
+
+    .danger-button:hover {
+      background: #b91c1c;
+    }
+
+    .success-button {
+      background: #16a34a;
+    }
+
+    .success-button:hover {
+      background: #15803d;
+    }
+
+    .empty-state {
+      padding: 20px;
+      text-align: center;
+      color: #6b7280;
+      border: 1px dashed #cbd5e1;
+      border-radius: 12px;
+      background: #f8fafc;
+    }
+
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+
+    .compare-table th,
+    .compare-table td {
+      border: 1px solid #d1d5db;
+      padding: 9px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .compare-table th {
+      background: #f3f4f6;
+    }
+
+    .small-input {
+      min-height: auto;
+    }
+
     @media (min-width: 720px) {
       .grid-2 {
         grid-template-columns: 1fr 1fr;
@@ -654,6 +779,55 @@
         </div>
       </details>
     </section>
+
+
+    <section class="card" id="objectArchiveSection">
+      <h2>📁 Objektakte & meine Immobilien</h2>
+
+      <p class="hint">
+        Speichere die aktuelle Immobilie mit Bewertung, Link, Notizen und Status. Alle Daten bleiben lokal auf diesem Gerät.
+      </p>
+
+      <div class="grid grid-3">
+        <div>
+          <label for="objectTitle">Objekttitel</label>
+          <input id="objectTitle" type="text" value="Wohnung Erding – Goethestraße" />
+        </div>
+
+        <div>
+          <label for="objectAddress">Adresse / Ort</label>
+          <input id="objectAddress" type="text" value="Erding, Goethestraße" />
+        </div>
+
+        <div>
+          <label for="objectStatus">Status</label>
+          <select id="objectStatus">
+            <option value="neu">Neu</option>
+            <option value="besichtigen" selected>Besichtigen</option>
+            <option value="unterlagen">Unterlagen prüfen</option>
+            <option value="verhandeln">Verhandeln</option>
+            <option value="favorit">Favorit</option>
+            <option value="abgelehnt">Abgelehnt</option>
+          </select>
+        </div>
+      </div>
+
+      <label for="objectLink">Inserat-Link</label>
+      <input id="objectLink" type="text" placeholder="https://..." />
+
+      <label for="objectNotes">Kurznotiz zur Immobilie</label>
+      <textarea id="objectNotes" class="small-input" placeholder="z. B. Wohnfläche klären, Heizung prüfen, Verkäufertermin am ..."></textarea>
+
+      <div class="object-toolbar">
+        <button class="success-button" onclick="saveCurrentProperty()">Aktuelles Objekt speichern</button>
+        <button class="secondary-button" onclick="renderSavedProperties()">Liste aktualisieren</button>
+        <button class="orange-button" onclick="showPropertyComparison()">Ausgewählte vergleichen</button>
+      </div>
+
+      <div id="propertyComparison"></div>
+      <div id="savedProperties" class="object-list"></div>
+    </section>
+
 
     <section class="card">
       <h2>📊 Ergebnisse</h2>
@@ -1397,6 +1571,379 @@
           block: "start"
         });
       };
+    })();
+  </script>
+
+
+  <script>
+    (() => {
+      "use strict";
+
+      const PROPERTY_STORAGE_KEY = "immoAgentPropertiesV1";
+
+      function readProperties() {
+        try {
+          const data = JSON.parse(localStorage.getItem(PROPERTY_STORAGE_KEY) || "[]");
+          return Array.isArray(data) ? data : [];
+        } catch (error) {
+          console.warn("Objektliste konnte nicht gelesen werden.", error);
+          return [];
+        }
+      }
+
+      function writeProperties(items) {
+        localStorage.setItem(PROPERTY_STORAGE_KEY, JSON.stringify(items));
+      }
+
+      function valueOf(id) {
+        return document.getElementById(id)?.value || "";
+      }
+
+      function numberOf(id) {
+        const raw = valueOf(id);
+        const number = Number(String(raw).replace(",", "."));
+        return Number.isFinite(number) ? number : 0;
+      }
+
+      function formatEuro(value) {
+        return new Intl.NumberFormat("de-DE", {
+          style: "currency",
+          currency: "EUR",
+          maximumFractionDigits: 0
+        }).format(value || 0);
+      }
+
+      function calculateCurrentObjectSnapshot() {
+        const purchasePrice = numberOf("eoPurchasePrice");
+        const area = numberOf("eoArea");
+        const houseFee = numberOf("eoHouseFee");
+        const currentWarmRent = numberOf("eoCurrentWarmRent");
+        const cashEquity = numberOf("eoCashEquity");
+        const apartmentValue = numberOf("eoApartmentValue");
+        const interest = numberOf("eoInterest");
+        const repayment = numberOf("eoRepayment");
+        const reserve = numberOf("eoReserve");
+        const taxRate = numberOf("eoTaxRate");
+        const brokerRate = numberOf("eoBrokerRate");
+        const notaryRate = numberOf("eoNotaryRate");
+        const buildYear = numberOf("eoBuildYear");
+        const targetMin = numberOf("eoTargetPriceMin");
+        const targetMax = numberOf("eoTargetPriceMax");
+
+        const ancillaryCosts = purchasePrice * ((taxRate + brokerRate + notaryRate) / 100);
+        const totalCost = purchasePrice + ancillaryCosts;
+        const loan = Math.max(0, totalCost - cashEquity);
+        const monthlyLoanPayment = loan * ((interest + repayment) / 100) / 12;
+        const totalMonthly = monthlyLoanPayment + houseFee + reserve;
+        const monthlyDifference = totalMonthly - currentWarmRent;
+        const pricePerSqm = area > 0 ? purchasePrice / area : 0;
+
+        let score = 50;
+        const monthlyRatio = totalMonthly / Math.max(currentWarmRent, 1);
+
+        if (monthlyRatio <= 1.02) score += 18;
+        else if (monthlyRatio <= 1.10) score += 12;
+        else if (monthlyRatio <= 1.20) score += 5;
+        else score -= 8;
+
+        if (apartmentValue >= 120000) score += 12;
+        else if (apartmentValue >= 70000) score += 7;
+
+        const cashAfterCosts = cashEquity - ancillaryCosts;
+        if (cashAfterCosts >= 15000) score += 10;
+        else if (cashAfterCosts >= 5000) score += 4;
+        else score -= 8;
+
+        if (repayment >= 2.5) score += 8;
+        else if (repayment >= 2.0) score += 4;
+        else score -= 8;
+
+        if (buildYear < 1970) score -= 5;
+
+        if (purchasePrice <= targetMax) score += 7;
+        else if (purchasePrice <= targetMax + 10000) score += 2;
+        else score -= 4;
+
+        score = Math.max(0, Math.min(100, Math.round(score)));
+
+        return {
+          purchasePrice,
+          area,
+          houseFee,
+          currentWarmRent,
+          cashEquity,
+          apartmentValue,
+          interest,
+          repayment,
+          reserve,
+          buildYear,
+          targetMin,
+          targetMax,
+          ancillaryCosts,
+          totalCost,
+          loan,
+          monthlyLoanPayment,
+          totalMonthly,
+          monthlyDifference,
+          pricePerSqm,
+          score
+        };
+      }
+
+      function statusLabel(status) {
+        const labels = {
+          neu: "Neu",
+          besichtigen: "Besichtigen",
+          unterlagen: "Unterlagen prüfen",
+          verhandeln: "Verhandeln",
+          favorit: "Favorit",
+          abgelehnt: "Abgelehnt"
+        };
+        return labels[status] || status;
+      }
+
+      function statusBadge(status) {
+        if (status === "favorit") return "badge-yellow";
+        if (status === "verhandeln") return "badge-green";
+        if (status === "abgelehnt") return "badge-red";
+        if (status === "unterlagen") return "badge-blue";
+        return "badge-gray";
+      }
+
+      function scoreBadge(score) {
+        if (score >= 80) return "badge-green";
+        if (score >= 65) return "badge-yellow";
+        return "badge-red";
+      }
+
+      window.saveCurrentProperty = function saveCurrentProperty() {
+        const title = valueOf("objectTitle").trim();
+        const address = valueOf("objectAddress").trim();
+
+        if (!title) {
+          alert("Bitte einen Objekttitel eingeben.");
+          return;
+        }
+
+        const snapshot = calculateCurrentObjectSnapshot();
+        const properties = readProperties();
+
+        const item = {
+          id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+          title,
+          address,
+          status: valueOf("objectStatus"),
+          link: valueOf("objectLink").trim(),
+          notes: valueOf("objectNotes").trim(),
+          favorite: valueOf("objectStatus") === "favorit",
+          selected: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          ...snapshot
+        };
+
+        properties.unshift(item);
+        writeProperties(properties);
+        renderSavedProperties();
+
+        alert("Objekt wurde in deiner Objektakte gespeichert.");
+      };
+
+      window.renderSavedProperties = function renderSavedProperties() {
+        const properties = readProperties();
+        const container = document.getElementById("savedProperties");
+
+        if (!properties.length) {
+          container.innerHTML = `
+            <div class="empty-state">
+              Noch keine Immobilie gespeichert.
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = properties.map(item => `
+          <article class="object-card ${item.favorite ? "favorite" : ""}">
+            <div class="object-card-header">
+              <div>
+                <h3>${escapeHtml(item.title)}</h3>
+                <div class="object-meta">
+                  ${escapeHtml(item.address || "Keine Adresse")}<br>
+                  Gespeichert: ${new Date(item.createdAt).toLocaleString("de-DE")}
+                </div>
+              </div>
+
+              <div>
+                <span class="badge ${scoreBadge(item.score)}">Score ${item.score}/100</span>
+                <span class="badge ${statusBadge(item.status)}">${statusLabel(item.status)}</span>
+              </div>
+            </div>
+
+            <div class="grid grid-3" style="margin-top:12px;">
+              <div class="metric"><span>Kaufpreis</span><strong>${formatEuro(item.purchasePrice)}</strong></div>
+              <div class="metric"><span>Wohnfläche</span><strong>${item.area || 0} m²</strong></div>
+              <div class="metric"><span>Preis je m²</span><strong>${formatEuro(item.pricePerSqm)}</strong></div>
+              <div class="metric"><span>Monatsbelastung</span><strong>${formatEuro(item.totalMonthly)}</strong></div>
+              <div class="metric"><span>Vergleich Warmmiete</span><strong>${item.monthlyDifference >= 0 ? "+" : ""}${formatEuro(item.monthlyDifference)}</strong></div>
+              <div class="metric"><span>Zielpreis</span><strong>${formatEuro(item.targetMin)}–${formatEuro(item.targetMax)}</strong></div>
+            </div>
+
+            ${item.notes ? `<p><strong>Notiz:</strong> ${escapeHtml(item.notes)}</p>` : ""}
+            ${item.link ? `<p><a href="${escapeAttribute(item.link)}" target="_blank" rel="noopener noreferrer">Inserat öffnen</a></p>` : ""}
+
+            <div class="object-actions">
+              <label style="display:flex;align-items:center;gap:7px;margin:0 8px 0 0;font-weight:normal;">
+                <input type="checkbox" style="width:18px;height:18px;margin:0;"
+                  ${item.selected ? "checked" : ""}
+                  onchange="togglePropertySelection('${item.id}', this.checked)">
+                Vergleichen
+              </label>
+
+              <button class="secondary-button" onclick="loadPropertyIntoForm('${item.id}')">Laden</button>
+              <button class="orange-button" onclick="toggleFavoriteProperty('${item.id}')">
+                ${item.favorite ? "Favorit entfernen" : "Als Favorit"}
+              </button>
+              <button class="danger-button" onclick="deleteSavedProperty('${item.id}')">Löschen</button>
+            </div>
+          </article>
+        `).join("");
+      };
+
+      window.loadPropertyIntoForm = function loadPropertyIntoForm(id) {
+        const item = readProperties().find(property => property.id === id);
+        if (!item) return;
+
+        const mapping = {
+          eoPurchasePrice: item.purchasePrice,
+          eoArea: item.area,
+          eoHouseFee: item.houseFee,
+          eoCurrentWarmRent: item.currentWarmRent,
+          eoCashEquity: item.cashEquity,
+          eoApartmentValue: item.apartmentValue,
+          eoInterest: item.interest,
+          eoRepayment: item.repayment,
+          eoReserve: item.reserve,
+          eoBuildYear: item.buildYear,
+          eoTargetPriceMin: item.targetMin,
+          eoTargetPriceMax: item.targetMax,
+          objectTitle: item.title,
+          objectAddress: item.address,
+          objectStatus: item.status,
+          objectLink: item.link,
+          objectNotes: item.notes
+        };
+
+        Object.entries(mapping).forEach(([id, value]) => {
+          const element = document.getElementById(id);
+          if (element && value !== undefined && value !== null) element.value = value;
+        });
+
+        if (typeof window.calculateOwnerOccupier === "function") {
+          window.calculateOwnerOccupier();
+        }
+
+        document.getElementById("ownerOccupierResult")?.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+      };
+
+      window.deleteSavedProperty = function deleteSavedProperty(id) {
+        if (!confirm("Dieses Objekt wirklich löschen?")) return;
+
+        const updated = readProperties().filter(item => item.id !== id);
+        writeProperties(updated);
+        renderSavedProperties();
+        document.getElementById("propertyComparison").innerHTML = "";
+      };
+
+      window.toggleFavoriteProperty = function toggleFavoriteProperty(id) {
+        const properties = readProperties();
+        const item = properties.find(property => property.id === id);
+        if (!item) return;
+
+        item.favorite = !item.favorite;
+        item.status = item.favorite ? "favorit" : (item.status === "favorit" ? "besichtigen" : item.status);
+        item.updatedAt = new Date().toISOString();
+
+        writeProperties(properties);
+        renderSavedProperties();
+      };
+
+      window.togglePropertySelection = function togglePropertySelection(id, selected) {
+        const properties = readProperties();
+        const item = properties.find(property => property.id === id);
+        if (!item) return;
+
+        item.selected = selected;
+        writeProperties(properties);
+      };
+
+      window.showPropertyComparison = function showPropertyComparison() {
+        const selected = readProperties().filter(item => item.selected);
+        const box = document.getElementById("propertyComparison");
+
+        if (selected.length < 2) {
+          box.innerHTML = `
+            <div class="extract-warning">
+              Bitte mindestens zwei Immobilien über „Vergleichen“ auswählen.
+            </div>
+          `;
+          return;
+        }
+
+        const rows = [
+          ["Scout-Score", ...selected.map(item => `${item.score}/100`)],
+          ["Kaufpreis", ...selected.map(item => formatEuro(item.purchasePrice))],
+          ["Wohnfläche", ...selected.map(item => `${item.area} m²`)],
+          ["Preis je m²", ...selected.map(item => formatEuro(item.pricePerSqm))],
+          ["Hausgeld", ...selected.map(item => formatEuro(item.houseFee))],
+          ["Monatsbelastung", ...selected.map(item => formatEuro(item.totalMonthly))],
+          ["Differenz zur Warmmiete", ...selected.map(item => `${item.monthlyDifference >= 0 ? "+" : ""}${formatEuro(item.monthlyDifference)}`)],
+          ["Baujahr", ...selected.map(item => item.buildYear || "-")],
+          ["Status", ...selected.map(item => statusLabel(item.status))]
+        ];
+
+        box.innerHTML = `
+          <div class="result">
+            <h3>⚖️ Immobilienvergleich</h3>
+            <div style="overflow-x:auto;">
+              <table class="compare-table">
+                <thead>
+                  <tr>
+                    <th>Kriterium</th>
+                    ${selected.map(item => `<th>${escapeHtml(item.title)}</th>`).join("")}
+                  </tr>
+                </thead>
+                <tbody>
+                  ${rows.map(row => `
+                    <tr>
+                      ${row.map(cell => `<td>${cell}</td>`).join("")}
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+
+        box.scrollIntoView({ behavior: "smooth", block: "start" });
+      };
+
+      function escapeHtml(value) {
+        return String(value || "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function escapeAttribute(value) {
+        return escapeHtml(value);
+      }
+
+      document.addEventListener("DOMContentLoaded", renderSavedProperties);
     })();
   </script>
 
