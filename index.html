@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>Immo-Agent</title>
- 
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -16,7 +16,7 @@
     }
 
     .container {
-      max-width: 900px;
+      max-width: 1000px;
       margin: 0 auto;
     }
 
@@ -59,7 +59,7 @@
     }
 
     textarea {
-      min-height: 180px;
+      min-height: 150px;
       resize: vertical;
       font-family: Arial, sans-serif;
     }
@@ -88,13 +88,22 @@
       background: #1f2937;
     }
 
+    .orange-button {
+      background: #d97706;
+    }
+
+    .orange-button:hover {
+      background: #b45309;
+    }
+
     .hint {
       color: #6b7280;
       font-size: 14px;
       line-height: 1.5;
     }
 
-    .result {
+    .result,
+    .result-card {
       background: white;
       padding: 18px;
       border-radius: 16px;
@@ -154,14 +163,159 @@
       gap: 12px;
     }
 
+    .score-wrap {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 18px;
+      align-items: center;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 14px;
+      padding: 16px;
+      margin-top: 16px;
+    }
+
+    .score-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 10px solid #16a34a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      box-sizing: border-box;
+      margin: auto;
+    }
+
+    .score-number {
+      font-size: 30px;
+      font-weight: bold;
+    }
+
+    .score-small {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .metric {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .metric span {
+      display: block;
+      color: #6b7280;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .metric strong {
+      font-size: 18px;
+    }
+
+    .traffic-box {
+      border-radius: 12px;
+      padding: 14px;
+      min-height: 130px;
+    }
+
+    .traffic-green {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+    }
+
+    .traffic-yellow {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+    }
+
+    .traffic-red {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+    }
+
+    .traffic-box h4 {
+      margin-top: 0;
+    }
+
+    .check-row {
+      display: grid;
+      grid-template-columns: 28px 1fr 150px;
+      gap: 10px;
+      align-items: center;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 10px 0;
+    }
+
+    .check-row input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin: 0;
+    }
+
+    .check-row label {
+      margin: 0;
+      font-weight: normal;
+    }
+
+    .check-row select {
+      margin: 0;
+      padding: 8px;
+      font-size: 14px;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .button-row button {
+      flex: 1 1 180px;
+    }
+
     @media (min-width: 720px) {
       .grid-2 {
         grid-template-columns: 1fr 1fr;
       }
 
       .grid-3 {
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-}
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      }
+    }
+
+    @media (max-width: 620px) {
+      .score-wrap {
+        grid-template-columns: 1fr;
+      }
+
+      .check-row {
+        grid-template-columns: 28px 1fr;
+      }
+
+      .check-row select {
+        grid-column: 2;
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+
+      .card {
+        box-shadow: none;
+        border: 1px solid #d1d5db;
+      }
+
+      button {
+        display: none;
+      }
     }
   </style>
 </head>
@@ -175,84 +329,58 @@
     </p>
 
     <section class="card">
-  <h2>🔍 Immobilien suchen</h2>
+      <h2>🔍 Immobilien suchen</h2>
 
-  <p class="hint">
-    Wähle Objektart, Maximalpreis und Radius. Die Bewertung erfolgt aktuell über deine Testdaten-API.
-  </p>
+      <p class="hint">
+        Wähle Objektart, Maximalpreis und Radius. Die Bewertung erfolgt aktuell über deine Testdaten-API.
+      </p>
 
-  <div class="grid grid-3">
-    <div>
-      <label for="type">Objektart</label>
-      <select id="type">
-        <option value="">Alle Objektarten</option>
-        <option value="Wohnung Kauf">Wohnung Kauf</option>
-        <option value="Wohnung Miete">Wohnung Miete</option>
-        <option value="Haus Kauf">Haus Kauf</option>
-        <option value="Haus Miete">Haus Miete</option>
-        <option value="Garage Kauf">Garage Kauf</option>
-        <option value="Garage Miete">Garage Miete</option>
-      </select>
-    </div>
+      <div class="grid grid-3">
+        <div>
+          <label for="type">Objektart</label>
+          <select id="type">
+            <option value="">Alle Objektarten</option>
+            <option value="Wohnung Kauf">Wohnung Kauf</option>
+            <option value="Wohnung Miete">Wohnung Miete</option>
+            <option value="Haus Kauf">Haus Kauf</option>
+            <option value="Haus Miete">Haus Miete</option>
+            <option value="Garage Kauf">Garage Kauf</option>
+            <option value="Garage Miete">Garage Miete</option>
+          </select>
+        </div>
 
-    <div>
-      <label for="maxPrice">Maximalpreis</label>
-      <input
-        type="number"
-        id="maxPrice"
-        placeholder="leer lassen = egal"
-        value=""
-      />
-    </div>
+        <div>
+          <label for="maxPrice">Maximalpreis</label>
+          <input type="number" id="maxPrice" placeholder="leer lassen = egal" />
+        </div>
 
-    <div>
-      <label for="radius">Radius in km</label>
-      <input
-        type="number"
-        id="radius"
-        placeholder="leer lassen = egal"
-        value=""
-      />
-    </div>
-  </div>
+        <div>
+          <label for="radius">Radius in km</label>
+          <input type="number" id="radius" placeholder="leer lassen = egal" />
+        </div>
+      </div>
 
-  <div class="grid grid-3">
-    <div>
-      <label for="minArea">Mindestgröße m²</label>
-      <input
-        type="number"
-        id="minArea"
-        placeholder="leer lassen = egal"
-        value=""
-      />
-    </div>
+      <div class="grid grid-3">
+        <div>
+          <label for="minArea">Mindestgröße m²</label>
+          <input type="number" id="minArea" placeholder="leer lassen = egal" />
+        </div>
 
-    <div>
-      <label for="maxArea">Maximalgröße m²</label>
-      <input
-        type="number"
-        id="maxArea"
-        placeholder="leer lassen = egal"
-        value=""
-      />
-    </div>
+        <div>
+          <label for="maxArea">Maximalgröße m²</label>
+          <input type="number" id="maxArea" placeholder="leer lassen = egal" />
+        </div>
 
-    <div>
-      <label for="minRooms">Mindestzimmer</label>
-      <input
-        type="number"
-        id="minRooms"
-        step="0.5"
-        placeholder="leer lassen = egal"
-        value=""
-      />
-    </div>
-  </div>
+        <div>
+          <label for="minRooms">Mindestzimmer</label>
+          <input type="number" id="minRooms" step="0.5" placeholder="leer lassen = egal" />
+        </div>
+      </div>
 
-  <button onclick="searchProperties()">
-    Immobilien suchen und bewerten
-  </button>
-</section>
+      <button onclick="searchProperties()">
+        Immobilien suchen und bewerten
+      </button>
+    </section>
 
     <section class="card">
       <h2>🧪 Zusatzbewertung</h2>
@@ -294,8 +422,7 @@
         <br />
 
         <p class="hint">
-          Kopiere hier später den Text aus einem Exposé hinein. Daraus kann der Bot anschließend Preis,
-          Fläche, Miete, Hausgeld, Lage und Risiken erkennen.
+          Kopiere hier später den Text aus einem Exposé hinein.
         </p>
 
         <label for="exposeText">Exposé-Text</label>
@@ -312,53 +439,43 @@
         </button>
 
         <div id="textResult"></div>
-</details>
+      </details>
 
-<h3>Bewertungsart</h3>
+      <h3>Bewertungsart</h3>
 
-<div class="grid grid-2">
-  <div>
-    <label for="usage">Nutzung</label>
-    <select id="usage">
-      <option value="kapitalanlage" selected>Kapitalanlage / Vermietung</option>
-      <option value="eigennutzung">Eigennutzung</option>
-    </select>
-  </div>
+      <div class="grid grid-2">
+        <div>
+          <label for="usage">Nutzung</label>
+          <select id="usage">
+            <option value="kapitalanlage">Kapitalanlage / Vermietung</option>
+            <option value="eigennutzung" selected>Eigennutzung</option>
+          </select>
+        </div>
 
-  <div>
-    <label for="rentPerSqm">Ortsübliche Miete €/m²</label>
-    <input id="rentPerSqm" type="number" value="20" step="1">
-  </div>
-</div>
+        <div>
+          <label for="rentPerSqm">Ortsübliche Miete €/m²</label>
+          <input id="rentPerSqm" type="number" value="15" step="0.5">
+        </div>
+      </div>
 
-<br />
+      <br />
 
-<details>
-  <summary>🏦 Finanzierung anpassen</summary>
+      <details>
+        <summary>🏦 Finanzierung anpassen</summary>
 
-  <br />
+        <br />
 
-  <h3>Finanzierung Beispiel 1</h3>
+        <h3>Finanzierung Beispiel 1</h3>
 
         <div class="grid grid-2">
           <div>
             <label for="interest1">Zins Beispiel 1 in %</label>
-            <input
-              type="number"
-              id="interest1"
-              step="0.1"
-              value="3.8"
-            />
+            <input type="number" id="interest1" step="0.1" value="3.8" />
           </div>
 
           <div>
             <label for="repayment1">Tilgung Beispiel 1 in %</label>
-            <input
-              type="number"
-              id="repayment1"
-              step="0.1"
-              value="1.0"
-            />
+            <input type="number" id="repayment1" step="0.1" value="1.0" />
           </div>
         </div>
 
@@ -367,83 +484,660 @@
         <div class="grid grid-2">
           <div>
             <label for="interest2">Zins Beispiel 2 in %</label>
-            <input
-              type="number"
-              id="interest2"
-              step="0.1"
-              value="4.5"
-            />
+            <input type="number" id="interest2" step="0.1" value="3.8" />
           </div>
 
           <div>
             <label for="repayment2">Tilgung Beispiel 2 in %</label>
-            <input
-              type="number"
-              id="repayment2"
-              step="0.1"
-              value="2.0"
-            />
+            <input type="number" id="repayment2" step="0.1" value="2.5" />
           </div>
         </div>
 
         <label for="equity">Eigenkapital</label>
-        <input
-          type="number"
-          id="equity"
-          placeholder="z. B. 0"
-          value="0"
-        />
-      </details>    </section>
+        <input type="number" id="equity" value="30000" />
+      </details>
+    </section>
+
+    <section class="card">
+      <h2>🏡 Eigennutzer-Analyse</h2>
+
+      <p class="hint">
+        Persönliche Bewertung für eure Wohnungssuche. Die Werte werden lokal im Browser gespeichert.
+      </p>
+
+      <div class="grid grid-3">
+        <div>
+          <label for="eoPurchasePrice">Kaufpreis</label>
+          <input id="eoPurchasePrice" type="number" value="350000" />
+        </div>
+
+        <div>
+          <label for="eoArea">Wohnfläche m²</label>
+          <input id="eoArea" type="number" value="78" step="0.5" />
+        </div>
+
+        <div>
+          <label for="eoHouseFee">Hausgeld monatlich</label>
+          <input id="eoHouseFee" type="number" value="350" />
+        </div>
+      </div>
+
+      <div class="grid grid-3">
+        <div>
+          <label for="eoCurrentWarmRent">Aktuelle Warmmiete</label>
+          <input id="eoCurrentWarmRent" type="number" value="2200" />
+        </div>
+
+        <div>
+          <label for="eoCashEquity">Flüssiges Eigenkapital</label>
+          <input id="eoCashEquity" type="number" value="30000" />
+        </div>
+
+        <div>
+          <label for="eoApartmentValue">Wert schuldenfreies Apartment</label>
+          <input id="eoApartmentValue" type="number" value="150000" />
+        </div>
+      </div>
+
+      <div class="grid grid-3">
+        <div>
+          <label for="eoInterest">Zins in %</label>
+          <input id="eoInterest" type="number" value="3.8" step="0.1" />
+        </div>
+
+        <div>
+          <label for="eoRepayment">Tilgung in %</label>
+          <input id="eoRepayment" type="number" value="2.5" step="0.1" />
+        </div>
+
+        <div>
+          <label for="eoReserve">Zusätzliche Rücklage monatlich</label>
+          <input id="eoReserve" type="number" value="100" />
+        </div>
+      </div>
+
+      <details>
+        <summary>⚙️ Nebenkosten und Zielpreis anpassen</summary>
+
+        <div class="grid grid-3">
+          <div>
+            <label for="eoTaxRate">Grunderwerbsteuer %</label>
+            <input id="eoTaxRate" type="number" value="3.5" step="0.1" />
+          </div>
+
+          <div>
+            <label for="eoBrokerRate">Makler %</label>
+            <input id="eoBrokerRate" type="number" value="3.57" step="0.01" />
+          </div>
+
+          <div>
+            <label for="eoNotaryRate">Notar und Grundbuch %</label>
+            <input id="eoNotaryRate" type="number" value="1.7" step="0.1" />
+          </div>
+        </div>
+
+        <div class="grid grid-3">
+          <div>
+            <label for="eoBuildYear">Baujahr</label>
+            <input id="eoBuildYear" type="number" value="1962" />
+          </div>
+
+          <div>
+            <label for="eoTargetPriceMin">Zielpreis von</label>
+            <input id="eoTargetPriceMin" type="number" value="330000" />
+          </div>
+
+          <div>
+            <label for="eoTargetPriceMax">Zielpreis bis</label>
+            <input id="eoTargetPriceMax" type="number" value="340000" />
+          </div>
+        </div>
+      </details>
+
+      <div class="button-row">
+        <button onclick="calculateOwnerOccupier()">Bewertung berechnen</button>
+        <button class="secondary-button" onclick="saveOwnerOccupier()">Bewertung speichern</button>
+        <button class="orange-button" onclick="resetOwnerOccupier()">Gespeicherte Werte löschen</button>
+      </div>
+
+      <div id="ownerOccupierResult"></div>
+
+      <details open>
+        <summary>✅ Verkäufer-Checkliste</summary>
+
+        <div id="sellerChecklist"></div>
+
+        <label for="sellerNotes">Notizen zum Verkäufertermin</label>
+        <textarea id="sellerNotes" placeholder="Antworten, Auffälligkeiten und offene Punkte ..."></textarea>
+
+        <div class="button-row">
+          <button class="secondary-button" onclick="saveChecklist()">Checkliste speichern</button>
+          <button onclick="window.print()">Checkliste und Bewertung drucken</button>
+        </div>
+      </details>
+    </section>
 
     <section class="card">
       <h2>📊 Ergebnisse</h2>
 
       <div id="results">
+        <div class="result-card">
+          <h3>Beispielbewertung</h3>
 
-    <div class="result-card">
+          <p><strong>Bewertung:</strong> 🟡 6/10 – Prüfen</p>
 
-        <h3>Beispielbewertung</h3>
+          <h4>Warum positiv?</h4>
 
-        <p><strong>Bewertung:</strong> 🟡 6/10 – Prüfen</p>
-
-        <h4>Warum positiv?</h4>
-
-        <ul>
-
+          <ul>
             <li>Preis liegt innerhalb deiner Suchgrenze.</li>
-
             <li>Objektart passt zur Auswahl.</li>
-
             <li>Suchradius wurde berücksichtigt.</li>
+          </ul>
 
-        </ul>
+          <h4>Risiken</h4>
 
-        <h4>Risiken</h4>
-
-        <ul>
-
+          <ul>
             <li>Energieausweis noch nicht geprüft.</li>
-
             <li>Hausgeld und Rücklagen fehlen noch.</li>
-
             <li>Marktpreisvergleich fehlt noch.</li>
+          </ul>
 
-        </ul>
-
-        <p><strong>Empfehlung:</strong> Genau prüfen</p>
-
-        <p class="hint">
-
-            Analyse vom: Wird später automatisch erzeugt.
-
-        </p>
-
-    </div>
-
-</div>
+          <p><strong>Empfehlung:</strong> Genau prüfen</p>
+        </div>
+      </div>
     </section>
   </div>
 
   <script src="script.js"></script>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const STORAGE_KEY = "immoAgentEigennutzungV1";
+      const CHECKLIST_KEY = "immoAgentVerkaeuferChecklisteV1";
+
+      const fieldIds = [
+        "eoPurchasePrice",
+        "eoArea",
+        "eoHouseFee",
+        "eoCurrentWarmRent",
+        "eoCashEquity",
+        "eoApartmentValue",
+        "eoInterest",
+        "eoRepayment",
+        "eoReserve",
+        "eoTaxRate",
+        "eoBrokerRate",
+        "eoNotaryRate",
+        "eoBuildYear",
+        "eoTargetPriceMin",
+        "eoTargetPriceMax"
+      ];
+
+      const checklistItems = [
+        "Offizielle Wohnfläche geklärt: 74 m² oder 78 m²",
+        "Wohnflächenberechnung erhalten",
+        "Bemaßten Grundriss erhalten",
+        "Energieausweis erhalten",
+        "Alter und Zustand der Gaszentralheizung geklärt",
+        "WEG-Protokolle der letzten drei bis fünf Jahre erhalten",
+        "Wirtschaftsplan und letzte Jahresabrechnung erhalten",
+        "Höhe der Instandhaltungsrücklage geprüft",
+        "Sonderumlagen geprüft",
+        "Balkonsanierung vollständig bezahlt und abgeschlossen",
+        "Feuchtigkeit, Schimmel und Kellerzustand geprüft",
+        "Fenster, Elektrik und Leitungen geprüft",
+        "Stellplatz oder Garage geklärt",
+        "Bezugsfreiheit zum 01.08.2026 bestätigt",
+        "Küche und Einbauten im Kaufpreis geklärt",
+        "Arbeits-, Schul- und Alltagswege nach Erding geprüft"
+      ];
+
+      function getNumber(id) {
+        const element = document.getElementById(id);
+        const value = Number(String(element?.value || "0").replace(",", "."));
+        return Number.isFinite(value) ? value : 0;
+      }
+
+      function formatEuro(value) {
+        return new Intl.NumberFormat("de-DE", {
+          style: "currency",
+          currency: "EUR",
+          maximumFractionDigits: 0
+        }).format(value || 0);
+      }
+
+      function scoreMeta(score) {
+        if (score >= 80) {
+          return {
+            className: "green",
+            color: "#16a34a",
+            icon: "🟢",
+            text: "Ernsthaft prüfenswert"
+          };
+        }
+
+        if (score >= 65) {
+          return {
+            className: "yellow",
+            color: "#eab308",
+            icon: "🟡",
+            text: "Interessant, aber Unterlagen genau prüfen"
+          };
+        }
+
+        return {
+          className: "red",
+          color: "#dc2626",
+          icon: "🔴",
+          text: "Aktuell zu riskant oder zu teuer"
+        };
+      }
+
+      function calculateScore(data) {
+        let score = 50;
+
+        const monthlyRatio = data.totalMonthly / Math.max(data.currentWarmRent, 1);
+
+        if (monthlyRatio <= 1.02) score += 18;
+        else if (monthlyRatio <= 1.10) score += 12;
+        else if (monthlyRatio <= 1.20) score += 5;
+        else score -= 8;
+
+        if (data.apartmentValue >= 120000) score += 12;
+        else if (data.apartmentValue >= 70000) score += 7;
+
+        if (data.cashAfterCosts >= 15000) score += 10;
+        else if (data.cashAfterCosts >= 5000) score += 4;
+        else score -= 8;
+
+        if (data.repayment >= 2.5) score += 8;
+        else if (data.repayment >= 2.0) score += 4;
+        else score -= 8;
+
+        if (data.buildYear < 1970) score -= 5;
+
+        if (data.purchasePrice <= data.targetMax) score += 7;
+        else if (data.purchasePrice <= data.targetMax + 10000) score += 2;
+        else score -= 4;
+
+        return Math.max(0, Math.min(100, Math.round(score)));
+      }
+
+      window.calculateOwnerOccupier = function () {
+        const purchasePrice = getNumber("eoPurchasePrice");
+        const area = getNumber("eoArea");
+        const houseFee = getNumber("eoHouseFee");
+        const currentWarmRent = getNumber("eoCurrentWarmRent");
+        const cashEquity = getNumber("eoCashEquity");
+        const apartmentValue = getNumber("eoApartmentValue");
+        const interest = getNumber("eoInterest");
+        const repayment = getNumber("eoRepayment");
+        const reserve = getNumber("eoReserve");
+        const taxRate = getNumber("eoTaxRate");
+        const brokerRate = getNumber("eoBrokerRate");
+        const notaryRate = getNumber("eoNotaryRate");
+        const buildYear = getNumber("eoBuildYear");
+        const targetMin = getNumber("eoTargetPriceMin");
+        const targetMax = getNumber("eoTargetPriceMax");
+
+        const ancillaryCosts =
+          purchasePrice * ((taxRate + brokerRate + notaryRate) / 100);
+
+        const totalCost = purchasePrice + ancillaryCosts;
+        const loan = Math.max(0, totalCost - cashEquity);
+
+        const monthlyLoanPayment =
+          loan * ((interest + repayment) / 100) / 12;
+
+        const totalMonthly =
+          monthlyLoanPayment + houseFee + reserve;
+
+        const monthlyDifference =
+          totalMonthly - currentWarmRent;
+
+        const pricePerSqm =
+          area > 0 ? purchasePrice / area : 0;
+
+        const cashAfterCosts =
+          cashEquity - ancillaryCosts;
+
+        const initialMonthlyRepayment =
+          loan * (repayment / 100) / 12;
+
+        const monthlyInterest =
+          interest / 100 / 12;
+
+        let remainingDebt = loan;
+
+        for (let month = 0; month < 120; month += 1) {
+          const interestPart =
+            remainingDebt * monthlyInterest;
+
+          const principalPart =
+            Math.max(0, monthlyLoanPayment - interestPart);
+
+          remainingDebt =
+            Math.max(0, remainingDebt - principalPart);
+        }
+
+        const data = {
+          purchasePrice,
+          area,
+          houseFee,
+          currentWarmRent,
+          cashEquity,
+          apartmentValue,
+          interest,
+          repayment,
+          reserve,
+          buildYear,
+          targetMin,
+          targetMax,
+          ancillaryCosts,
+          totalCost,
+          loan,
+          monthlyLoanPayment,
+          totalMonthly,
+          monthlyDifference,
+          pricePerSqm,
+          cashAfterCosts,
+          initialMonthlyRepayment,
+          remainingDebt
+        };
+
+        const score = calculateScore(data);
+        const meta = scoreMeta(score);
+
+        const positive = [
+          `Die aktuelle Warmmiete von ${formatEuro(currentWarmRent)} ist bereits hoch.`,
+          `Das schuldenfreie Apartment mit rund ${formatEuro(apartmentValue)} stärkt die Finanzierung als Zusatzsicherheit.`,
+          `Anfangs fließen rund ${formatEuro(initialMonthlyRepayment)} monatlich in die Tilgung.`
+        ];
+
+        const review = [
+          "Wohnfläche verbindlich klären: 74 m² oder 78 m².",
+          "WEG-Rücklage, Protokolle, Heizung und mögliche Sonderumlagen prüfen.",
+          "Die tatsächliche Bankkondition hängt davon ab, ob das Apartment als Zusatzsicherheit akzeptiert wird."
+        ];
+
+        const critical = [];
+
+        if (cashAfterCosts < 0) {
+          critical.push(
+            `Das liquide Eigenkapital deckt die Kaufnebenkosten nicht vollständig. Rund ${formatEuro(Math.abs(cashAfterCosts))} müssten zusätzlich finanziert werden.`
+          );
+        } else if (cashAfterCosts < 10000) {
+          critical.push(
+            `Nach den Kaufnebenkosten bleibt nur eine geringe Barreserve von etwa ${formatEuro(cashAfterCosts)}.`
+          );
+        }
+
+        if (buildYear < 1970) {
+          critical.push(
+            `Baujahr ${buildYear}: technische und energetische Risiken über die WEG-Unterlagen prüfen.`
+          );
+        }
+
+        if (purchasePrice > targetMax) {
+          critical.push(
+            `Der Kaufpreis liegt über dem internen Zielkorridor von ${formatEuro(targetMin)} bis ${formatEuro(targetMax)}.`
+          );
+        }
+
+        const result = document.getElementById("ownerOccupierResult");
+
+        result.innerHTML = `
+          <div class="result ${meta.className}">
+            <div class="score-wrap">
+              <div class="score-circle" style="border-color: ${meta.color}">
+                <div class="score-number">${score}</div>
+                <div class="score-small">von 100</div>
+              </div>
+
+              <div>
+                <h3>${meta.icon} ${meta.text}</h3>
+                <p>
+                  <strong>Scout-Fazit:</strong>
+                  Als Eigenheim grundsätzlich machbar, sofern Finanzierung,
+                  WEG-Unterlagen und technische Prüfung sauber sind.
+                </p>
+
+                <p class="hint">
+                  Die Berechnung ist eine Modellrechnung und keine Kreditzusage.
+                </p>
+              </div>
+            </div>
+
+            <div class="grid grid-3" style="margin-top: 14px;">
+              <div class="metric">
+                <span>Kaufpreis je m²</span>
+                <strong>${formatEuro(pricePerSqm)}</strong>
+              </div>
+
+              <div class="metric">
+                <span>Kaufnebenkosten</span>
+                <strong>${formatEuro(ancillaryCosts)}</strong>
+              </div>
+
+              <div class="metric">
+                <span>Gesamtkosten</span>
+                <strong>${formatEuro(totalCost)}</strong>
+              </div>
+
+              <div class="metric">
+                <span>Modell-Darlehen</span>
+                <strong>${formatEuro(loan)}</strong>
+              </div>
+
+              <div class="metric">
+                <span>Kreditrate</span>
+                <strong>${formatEuro(monthlyLoanPayment)}</strong>
+              </div>
+
+              <div class="metric">
+                <span>Gesamt pro Monat</span>
+                <strong>${formatEuro(totalMonthly)}</strong>
+              </div>
+
+              <div class="metric">
+                <span>Vergleich zur Warmmiete</span>
+                <strong>${monthlyDifference >= 0 ? "+" : ""}${formatEuro(monthlyDifference)}</strong>
+              </div>
+
+              <div class="metric">
+                <span>Restschuld nach 10 Jahren</span>
+                <strong>${formatEuro(remainingDebt)}</strong>
+              </div>
+
+              <div class="metric">
+                <span>Zielpreis</span>
+                <strong>${formatEuro(targetMin)} – ${formatEuro(targetMax)}</strong>
+              </div>
+            </div>
+
+            <div class="grid grid-3" style="margin-top: 14px;">
+              <div class="traffic-box traffic-green">
+                <h4>🟢 Positiv</h4>
+                <ul>
+                  ${positive.map(item => `<li>${item}</li>`).join("")}
+                </ul>
+              </div>
+
+              <div class="traffic-box traffic-yellow">
+                <h4>🟡 Prüfen</h4>
+                <ul>
+                  ${review.map(item => `<li>${item}</li>`).join("")}
+                </ul>
+              </div>
+
+              <div class="traffic-box traffic-red">
+                <h4>🔴 Kritisch</h4>
+                <ul>
+                  ${
+                    (critical.length
+                      ? critical
+                      : ["Aktuell kein automatischer Rot-Punkt. Die Unterlagenprüfung bleibt trotzdem Pflicht."]
+                    )
+                    .map(item => `<li>${item}</li>`)
+                    .join("")
+                  }
+                </ul>
+              </div>
+            </div>
+          </div>
+        `;
+      };
+
+      window.saveOwnerOccupier = function () {
+        const values = {};
+
+        fieldIds.forEach(id => {
+          values[id] = document.getElementById(id)?.value || "";
+        });
+
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify(values)
+        );
+
+        window.calculateOwnerOccupier();
+
+        alert(
+          "Die Eigennutzer-Bewertung wurde auf diesem Gerät gespeichert."
+        );
+      };
+
+      window.resetOwnerOccupier = function () {
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(CHECKLIST_KEY);
+        location.reload();
+      };
+
+      function renderChecklist(savedState = {}) {
+        const container =
+          document.getElementById("sellerChecklist");
+
+        container.innerHTML =
+          checklistItems.map((item, index) => {
+            const state =
+              savedState.items?.[index] || {};
+
+            return `
+              <div class="check-row">
+                <input
+                  type="checkbox"
+                  id="check-${index}"
+                  ${state.checked ? "checked" : ""}
+                />
+
+                <label for="check-${index}">
+                  ${item}
+                </label>
+
+                <select id="status-${index}">
+                  <option
+                    value="offen"
+                    ${state.status === "offen" ? "selected" : ""}
+                  >
+                    Offen
+                  </option>
+
+                  <option
+                    value="geklaert"
+                    ${state.status === "geklaert" ? "selected" : ""}
+                  >
+                    Geklärt
+                  </option>
+
+                  <option
+                    value="kritisch"
+                    ${state.status === "kritisch" ? "selected" : ""}
+                  >
+                    Kritisch
+                  </option>
+                </select>
+              </div>
+            `;
+          }).join("");
+
+        const notes =
+          document.getElementById("sellerNotes");
+
+        notes.value =
+          savedState.notes || "";
+      }
+
+      window.saveChecklist = function () {
+        const state = {
+          items: checklistItems.map((item, index) => ({
+            checked:
+              document.getElementById(`check-${index}`)?.checked || false,
+
+            status:
+              document.getElementById(`status-${index}`)?.value || "offen"
+          })),
+
+          notes:
+            document.getElementById("sellerNotes")?.value || ""
+        };
+
+        localStorage.setItem(
+          CHECKLIST_KEY,
+          JSON.stringify(state)
+        );
+
+        alert(
+          "Die Verkäufer-Checkliste wurde auf diesem Gerät gespeichert."
+        );
+      };
+
+      function loadSavedData() {
+        try {
+          const savedValues =
+            JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+
+          fieldIds.forEach(id => {
+            const element =
+              document.getElementById(id);
+
+            if (
+              element &&
+              savedValues[id] !== undefined
+            ) {
+              element.value =
+                savedValues[id];
+            }
+          });
+        } catch (error) {
+          console.warn(
+            "Gespeicherte Eigennutzer-Daten konnten nicht geladen werden.",
+            error
+          );
+        }
+
+        let checklistState = {};
+
+        try {
+          checklistState =
+            JSON.parse(localStorage.getItem(CHECKLIST_KEY) || "{}");
+        } catch (error) {
+          console.warn(
+            "Gespeicherte Checkliste konnte nicht geladen werden.",
+            error
+          );
+        }
+
+        renderChecklist(checklistState);
+        window.calculateOwnerOccupier();
+      }
+
+      document.addEventListener(
+        "DOMContentLoaded",
+        loadSavedData
+      );
+    })();
+  </script>
 </body>
 </html>
