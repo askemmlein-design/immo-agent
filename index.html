@@ -278,6 +278,44 @@
       flex: 1 1 180px;
     }
 
+
+    .extract-summary {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 12px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+    }
+
+    .extract-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .extract-item {
+      background: white;
+      border: 1px solid #dbeafe;
+      border-radius: 10px;
+      padding: 10px;
+    }
+
+    .extract-item span {
+      display: block;
+      color: #6b7280;
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+
+    .extract-warning {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+    }
+
     @media (min-width: 720px) {
       .grid-2 {
         grid-template-columns: 1fr 1fr;
@@ -1139,5 +1177,228 @@
       );
     })();
   </script>
+
+  <script>
+    (() => {
+      "use strict";
+
+      function cleanNumber(value) {
+        if (!value) return 0;
+
+        let cleaned = String(value)
+          .replace(/\s/g, "")
+          .replace(/€/g, "")
+          .replace(/[^\d.,-]/g, "");
+
+        if (cleaned.includes(".") && cleaned.includes(",")) {
+          cleaned = cleaned.replace(/\./g, "").replace(",", ".");
+        } else if (cleaned.includes(",")) {
+          cleaned = cleaned.replace(",", ".");
+        } else {
+          cleaned = cleaned.replace(/\.(?=\d{3}(?:\D|$))/g, "");
+        }
+
+        const number = Number(cleaned);
+        return Number.isFinite(number) ? number : 0;
+      }
+
+      function firstMatch(text, patterns) {
+        for (const pattern of patterns) {
+          const match = text.match(pattern);
+          if (match && match[1]) return cleanNumber(match[1]);
+        }
+        return 0;
+      }
+
+      function setField(id, value) {
+        if (!value) return;
+        const field = document.getElementById(id);
+        if (field) field.value = value;
+      }
+
+      function detectRisks(text) {
+        const lower = text.toLowerCase();
+        const risks = [];
+
+        if (/gaszentralheizung|gasheizung|gas-?etagenheizung/.test(lower)) {
+          risks.push("Gasheizung erkannt");
+        }
+
+        if (/erdgeschoss|hochparterre/.test(lower)) {
+          risks.push("Erdgeschoss/Hochparterre: Feuchtigkeit und Privatsphäre prüfen");
+        }
+
+        if (/sonderumlage/.test(lower)) {
+          risks.push("Sonderumlage wird erwähnt");
+        }
+
+        if (/sanierungsbedürftig|renovierungsbedürftig/.test(lower)) {
+          risks.push("Renovierungs- oder Sanierungsbedarf wird erwähnt");
+        }
+
+        if (/denkmalschutz|denkmalgeschützt/.test(lower)) {
+          risks.push("Denkmalschutz erkannt");
+        }
+
+        if (/erbbaurecht|erbpacht/.test(lower)) {
+          risks.push("Erbbaurecht/Erbpacht erkannt");
+        }
+
+        if (/vermietet|mietvertrag|mieter/.test(lower) && !/bezugsfrei/.test(lower)) {
+          risks.push("Möglicherweise nicht kurzfristig bezugsfrei");
+        }
+
+        return risks;
+      }
+
+      window.analyzeExposeText = function analyzeExposeText() {
+        const textArea = document.getElementById("exposeText");
+        const result = document.getElementById("textResult");
+        const text = textArea?.value?.trim() || "";
+
+        if (!text) {
+          alert("Bitte zuerst einen Exposé-Text einfügen.");
+          return;
+        }
+
+        const purchasePrice = firstMatch(text, [
+          /kaufpreis\s*[:\-]?\s*([\d.\s,]+)\s*€/i,
+          /preis\s*[:\-]?\s*([\d.\s,]+)\s*€/i,
+          /([\d.\s,]+)\s*€\s*kaufpreis/i
+        ]);
+
+        const area = firstMatch(text, [
+          /wohnfläche\s*(?:ca\.)?\s*[:\-]?\s*([\d.,]+)\s*m²/i,
+          /ca\.\s*([\d.,]+)\s*m²\s*wohnfläche/i,
+          /([\d.,]+)\s*m²\s*wohnfläche/i
+        ]);
+
+        const houseFee = firstMatch(text, [
+          /hausgeld\s*(?:derzeit|aktuell)?\s*[:\-]?\s*([\d.\s,]+)\s*€/i,
+          /hausgeld.*?([\d.\s,]+)\s*€\s*(?:monatlich|pro monat)/i,
+          /([\d.\s,]+)\s*€\s*hausgeld/i
+        ]);
+
+        const buildYear = firstMatch(text, [
+          /baujahr\s*[:\-]?\s*(\d{4})/i,
+          /aus dem jahr\s*(\d{4})/i,
+          /erbaut\s*(?:im jahr)?\s*(\d{4})/i
+        ]);
+
+        const rooms = firstMatch(text, [
+          /(\d+(?:[.,]\d+)?)\s*zimmer/i
+        ]);
+
+        const coldRent = firstMatch(text, [
+          /kaltmiete\s*[:\-]?\s*([\d.\s,]+)\s*€/i,
+          /nettokaltmiete\s*[:\-]?\s*([\d.\s,]+)\s*€/i
+        ]);
+
+        const commission = firstMatch(text, [
+          /(?:käufer)?provision\s*[:\-]?\s*([\d.,]+)\s*%/i,
+          /courtage\s*[:\-]?\s*([\d.,]+)\s*%/i
+        ]);
+
+        setField("eoPurchasePrice", purchasePrice);
+        setField("eoArea", area);
+        setField("eoHouseFee", houseFee);
+        setField("eoBuildYear", buildYear);
+        setField("eoBrokerRate", commission);
+
+        if (purchasePrice) {
+          const maxPrice = document.getElementById("maxPrice");
+          if (maxPrice) maxPrice.value = purchasePrice;
+        }
+
+        if (area) {
+          const minArea = document.getElementById("minArea");
+          const maxArea = document.getElementById("maxArea");
+          if (minArea) minArea.value = area;
+          if (maxArea) maxArea.value = area;
+        }
+
+        if (rooms) {
+          const minRooms = document.getElementById("minRooms");
+          if (minRooms) minRooms.value = rooms;
+        }
+
+        const risks = detectRisks(text);
+        const foundCount = [purchasePrice, area, houseFee, buildYear, rooms, coldRent, commission]
+          .filter(Boolean).length;
+
+        const confidence = Math.round((foundCount / 7) * 100);
+
+        result.innerHTML = `
+          <div class="extract-summary">
+            <h3>🤖 Exposé automatisch erkannt</h3>
+
+            <p>
+              <strong>Erkennungsgrad:</strong> ${confidence} %
+              – erkannte Werte wurden direkt in die Eigennutzer-Analyse übernommen.
+            </p>
+
+            <div class="extract-grid">
+              <div class="extract-item">
+                <span>Kaufpreis</span>
+                <strong>${purchasePrice ? purchasePrice.toLocaleString("de-DE") + " €" : "nicht erkannt"}</strong>
+              </div>
+
+              <div class="extract-item">
+                <span>Wohnfläche</span>
+                <strong>${area ? area.toLocaleString("de-DE") + " m²" : "nicht erkannt"}</strong>
+              </div>
+
+              <div class="extract-item">
+                <span>Zimmer</span>
+                <strong>${rooms || "nicht erkannt"}</strong>
+              </div>
+
+              <div class="extract-item">
+                <span>Hausgeld</span>
+                <strong>${houseFee ? houseFee.toLocaleString("de-DE") + " €" : "nicht erkannt"}</strong>
+              </div>
+
+              <div class="extract-item">
+                <span>Baujahr</span>
+                <strong>${buildYear || "nicht erkannt"}</strong>
+              </div>
+
+              <div class="extract-item">
+                <span>Kaltmiete</span>
+                <strong>${coldRent ? coldRent.toLocaleString("de-DE") + " €" : "nicht erkannt"}</strong>
+              </div>
+
+              <div class="extract-item">
+                <span>Provision</span>
+                <strong>${commission ? commission.toLocaleString("de-DE") + " %" : "nicht erkannt"}</strong>
+              </div>
+            </div>
+
+            ${
+              risks.length
+                ? `
+                  <div class="extract-warning">
+                    <strong>Automatisch erkannte Prüfpunkte:</strong>
+                    <ul>${risks.map(risk => `<li>${risk}</li>`).join("")}</ul>
+                  </div>
+                `
+                : ""
+            }
+          </div>
+        `;
+
+        if (typeof window.calculateOwnerOccupier === "function") {
+          window.calculateOwnerOccupier();
+        }
+
+        const ownerModule = document.querySelector("section.card h2");
+        document.getElementById("ownerOccupierResult")?.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+      };
+    })();
+  </script>
+
 </body>
 </html>
