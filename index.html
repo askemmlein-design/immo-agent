@@ -441,6 +441,85 @@
       min-height: auto;
     }
 
+
+    .info-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      margin-left: 6px;
+      border-radius: 50%;
+      background: #2563eb;
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+      font-style: normal;
+      cursor: help;
+      position: relative;
+      vertical-align: middle;
+      user-select: none;
+    }
+
+    .info-icon::after {
+      content: attr(data-info);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 10px);
+      transform: translateX(-50%);
+      width: min(320px, 78vw);
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #111827;
+      color: white;
+      font-size: 13px;
+      font-weight: normal;
+      line-height: 1.45;
+      text-align: left;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.22);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+      z-index: 9999;
+      white-space: normal;
+    }
+
+    .info-icon::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 4px);
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: #111827;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+      z-index: 10000;
+    }
+
+    .info-icon:hover::after,
+    .info-icon:hover::before,
+    .info-icon:focus::after,
+    .info-icon:focus::before {
+      opacity: 1;
+    }
+
+    .button-info-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex: 1 1 180px;
+    }
+
+    .button-info-wrap button {
+      flex: 1;
+    }
+
+    .summary-info {
+      margin-left: 8px;
+    }
+
     @media (min-width: 720px) {
       .grid-2 {
         grid-template-columns: 1fr 1fr;
@@ -2287,6 +2366,169 @@
 
         alert("Die Verkäufer-Checkliste wurde für dieses Objekt gespeichert.");
       };
+    })();
+  </script>
+
+
+  <script>
+    (() => {
+      "use strict";
+
+      const fieldHelp = {
+        type: "Hier wählst du, welche Art von Immobilie gesucht werden soll, zum Beispiel eine Wohnung zum Kauf oder ein Haus zur Miete.",
+        maxPrice: "Der höchste Preis, den du ausgeben möchtest. So werden zu teure Angebote direkt ausgefiltert.",
+        radius: "Wie weit die Immobilie vom gewünschten Ort entfernt sein darf. Ein größerer Radius zeigt mehr Angebote.",
+        minArea: "Die kleinste Wohnfläche, die für dich noch sinnvoll ist.",
+        maxArea: "Die größte Wohnfläche, die du berücksichtigen möchtest.",
+        minRooms: "Die Mindestanzahl an Zimmern. Küche und Bad zählen normalerweise nicht als Zimmer.",
+        propertyLink: "Hier kommt nur der reine Internet-Link zum Inserat hinein. Später wird dieser über n8n automatisch ausgewertet.",
+        exposeText: "Hier kannst du den Text aus dem Immobilien-Exposé einfügen. Die App versucht daraus Kaufpreis, Fläche, Hausgeld und weitere Daten zu erkennen.",
+        usage: "Wähle, ob du selbst einziehen möchtest oder die Immobilie vermieten willst. Die Bewertung unterscheidet sich je nach Nutzung.",
+        rentPerSqm: "Die übliche Kaltmiete pro Quadratmeter am Standort. Sie wird für die Bewertung als Kapitalanlage benötigt.",
+        interest1: "Beispiel-Zinssatz für eine erste Finanzierungsvariante. Damit kannst du sehen, wie sich unterschiedliche Zinsen auswirken.",
+        repayment1: "Anfängliche Tilgung der ersten Finanzierungsvariante. Je höher die Tilgung, desto schneller sinkt die Restschuld.",
+        interest2: "Zinssatz für eine zweite Vergleichsrechnung.",
+        repayment2: "Tilgung für die zweite Vergleichsrechnung.",
+        equity: "Geld, das du selbst in den Kauf einbringen kannst. Mehr Eigenkapital senkt normalerweise den Kreditbedarf.",
+        eoPurchasePrice: "Der Preis, den der Verkäufer für die Immobilie verlangt.",
+        eoArea: "Die offizielle Wohnfläche laut Exposé oder Wohnflächenberechnung.",
+        eoHouseFee: "Monatliche Zahlung an die Eigentümergemeinschaft. Darin können Heizung, Verwaltung, Hausmeister und Rücklagen enthalten sein.",
+        eoCurrentWarmRent: "Deine heutige monatliche Warmmiete. Sie dient als Vergleich zur späteren Eigentumsbelastung.",
+        eoCashEquity: "Geld, das sofort verfügbar ist, zum Beispiel auf Konto oder Tagesgeld.",
+        eoApartmentValue: "Ungefährer Wert einer bereits vorhandenen schuldenfreien Immobilie. Diese kann der Bank als zusätzliche Sicherheit dienen.",
+        eoInterest: "Der angenommene Kreditzins. Die echte Bankkondition kann später davon abweichen.",
+        eoRepayment: "Der Anteil, mit dem der Kredit jedes Jahr zurückgezahlt wird. Höhere Tilgung bedeutet höhere Rate, aber schneller weniger Schulden.",
+        eoReserve: "Zusätzlicher monatlicher Betrag für Reparaturen, Geräte oder kleinere Sonderkosten in der eigenen Wohnung.",
+        eoTaxRate: "Grunderwerbsteuer beim Immobilienkauf. In Bayern beträgt sie aktuell 3,5 Prozent.",
+        eoBrokerRate: "Maklerprovision in Prozent des Kaufpreises.",
+        eoNotaryRate: "Geschätzte Kosten für Notar und Grundbuch.",
+        eoBuildYear: "Jahr, in dem das Gebäude gebaut wurde. Ältere Gebäude können höhere Sanierungsrisiken haben.",
+        eoTargetPriceMin: "Unterer Wert deines persönlichen Verhandlungs- oder Wunschpreises.",
+        eoTargetPriceMax: "Oberer Wert, den du für noch vertretbar hältst.",
+        sellerNotes: "Hier kannst du Antworten, Auffälligkeiten und offene Fragen aus dem Verkäufertermin festhalten.",
+        objectTitle: "Kurzer Name für die Immobilie, damit du sie später schnell wiederfindest.",
+        objectAddress: "Adresse oder zumindest Ort und Straße des Objekts.",
+        objectStatus: "Der aktuelle Stand, zum Beispiel neu, besichtigen, Unterlagen prüfen oder verhandeln.",
+        objectLink: "Der reine Link zum Inserat. Zusätzlichen WhatsApp-Text am besten entfernen.",
+        objectNotes: "Kurze persönliche Notiz zur Immobilie, zum Beispiel offene Punkte oder dein erster Eindruck."
+      };
+
+      const buttonHelp = {
+        "Immobilien suchen und bewerten": "Startet die Suche mit deinen gewählten Filtern.",
+        "Link prüfen": "Prüft aktuell nur den Link. Die echte automatische Auswertung kommt später über n8n.",
+        "Exposé-Text bewerten": "Liest den eingefügten Exposé-Text aus und übernimmt erkannte Werte in die Analyse.",
+        "Bewertung berechnen": "Berechnet Score, Kaufnebenkosten, Monatsrate und Vergleich zur Warmmiete neu.",
+        "Bewertung speichern": "Speichert deine persönlichen Analysewerte lokal auf diesem Gerät.",
+        "Neue Immobilie": "Leert nur die Daten der aktuellen Immobilie. Deine persönlichen Finanzwerte bleiben erhalten.",
+        "Checkliste speichern": "Speichert den Stand der Verkäufer-Checkliste für das aktuell geladene Objekt.",
+        "Checkliste und Bewertung drucken": "Öffnet die Druckansicht für Bewertung und Checkliste.",
+        "Als neues Objekt speichern": "Legt eine neue Objektakte an, ohne ein vorhandenes Objekt zu überschreiben.",
+        "Geladenes Objekt aktualisieren": "Speichert Änderungen in der aktuell geladenen Objektakte.",
+        "Liste aktualisieren": "Lädt die gespeicherten Immobilien erneut aus dem Browser-Speicher.",
+        "Ausgewählte vergleichen": "Zeigt die markierten Immobilien in einer Vergleichstabelle."
+      };
+
+      const checklistHelp = {
+        "Offizielle Wohnfläche geklärt": "Prüfe, welche Wohnfläche rechtlich und rechnerisch wirklich gilt. Sie beeinflusst den Preis pro Quadratmeter.",
+        "Wohnflächenberechnung erhalten": "Lass dir die genaue Berechnung geben, damit du nachvollziehen kannst, welche Flächen mitgerechnet wurden.",
+        "Bemaßten Grundriss erhalten": "Ein Grundriss mit Maßen zeigt, ob Möbel und Raumaufteilung wirklich passen.",
+        "Energieausweis erhalten": "Der Energieausweis hilft, Heizkosten und energetischen Zustand einzuschätzen.",
+        "Alter und Zustand der Gaszentralheizung geklärt": "Eine alte Heizung kann bald hohe Kosten verursachen. Frage nach Alter, Reparaturen und Austauschplänen.",
+        "WEG-Protokolle der letzten drei bis fünf Jahre erhalten": "Darin stehen Probleme, Streit, geplante Sanierungen und Beschlüsse der Eigentümergemeinschaft.",
+        "Wirtschaftsplan und letzte Jahresabrechnung erhalten": "Damit siehst du, wie sich Hausgeld und laufende Kosten zusammensetzen.",
+        "Höhe der Instandhaltungsrücklage geprüft": "Die Rücklage ist das gemeinsame Sparguthaben der Eigentümergemeinschaft für größere Reparaturen.",
+        "Sonderumlagen geprüft": "Sonderumlagen sind zusätzliche Zahlungen, wenn größere Kosten nicht aus der Rücklage gedeckt werden.",
+        "Balkonsanierung vollständig bezahlt und abgeschlossen": "Kläre, ob noch Rechnungen oder Nachzahlungen offen sind.",
+        "Feuchtigkeit, Schimmel und Kellerzustand geprüft": "Feuchtigkeit kann teuer und gesundheitlich problematisch sein. Besonders Erdgeschoss und Keller genau ansehen.",
+        "Fenster, Elektrik und Leitungen geprüft": "Alte Bauteile können später hohe Sanierungskosten verursachen.",
+        "Stellplatz oder Garage geklärt": "Prüfe, ob ein Stellplatz dazugehört, extra kostet oder rechtlich separat geführt wird.",
+        "Bezugsfreiheit verbindlich bestätigt": "Stelle sicher, dass du zum vereinbarten Termin wirklich einziehen kannst.",
+        "Küche und Einbauten im Kaufpreis geklärt": "Kläre, was in der Wohnung bleibt und ob dafür ein zusätzlicher Preis verlangt wird.",
+        "Arbeits-, Schul- und Alltagswege nach Erding geprüft": "Teste, ob Fahrzeiten und Wege im Alltag für die Familie wirklich passen."
+      };
+
+      function createInfoIcon(text, extraClass = "") {
+        const icon = document.createElement("span");
+        icon.className = `info-icon ${extraClass}`.trim();
+        icon.textContent = "i";
+        icon.setAttribute("data-info", text);
+        icon.setAttribute("tabindex", "0");
+        icon.setAttribute("aria-label", "Information");
+        return icon;
+      }
+
+      function addFieldTooltips() {
+        document.querySelectorAll("label[for]").forEach(label => {
+          const id = label.getAttribute("for");
+          const help = fieldHelp[id];
+          if (!help || label.querySelector(".info-icon")) return;
+          label.appendChild(createInfoIcon(help));
+        });
+      }
+
+      function addButtonTooltips() {
+        document.querySelectorAll("button").forEach(button => {
+          const text = button.textContent.trim().replace(/\s+/g, " ");
+          const help = buttonHelp[text];
+          if (!help || button.parentElement?.classList.contains("button-info-wrap")) return;
+
+          const wrapper = document.createElement("span");
+          wrapper.className = "button-info-wrap";
+
+          button.parentNode.insertBefore(wrapper, button);
+          wrapper.appendChild(button);
+          wrapper.appendChild(createInfoIcon(help));
+        });
+      }
+
+      function addSummaryTooltips() {
+        const summaryHelp = {
+          "🔍 Immobilien suchen": "Hier legst du deine Suchkriterien fest.",
+          "🧪 Zusatzbewertung": "Hier kannst du einzelne Inserate per Link oder Exposé-Text prüfen.",
+          "🔗 Variante A: Link bewerten": "Diese Funktion wird später über n8n vollständig automatisiert.",
+          "📄 Variante B: Exposé-Text bewerten": "Hier liest die App Angaben aus einem eingefügten Exposé-Text aus.",
+          "⚖️ Bewertungsart": "Hier legst du fest, ob die Immobilie für Eigennutzung oder Vermietung bewertet wird.",
+          "🏦 Finanzierung anpassen": "Hier kannst du verschiedene Zins- und Tilgungsvarianten testen.",
+          "🏡 Eigennutzer-Analyse": "Hier wird geprüft, ob die Immobilie finanziell und persönlich zu euch passt.",
+          "⚙️ Nebenkosten und Zielpreis anpassen": "Hier kannst du Kaufnebenkosten und deinen Wunschpreis verändern.",
+          "✅ Verkäufer-Checkliste": "Diese Punkte solltest du vor einer Kaufentscheidung mit Verkäufer, Makler oder Verwaltung klären.",
+          "📁 Objektakte & meine Immobilien": "Hier speicherst und vergleichst du mehrere Immobilien.",
+          "📊 Ergebnisse": "Hier erscheinen die Ergebnisse aus Suche und Bewertung."
+        };
+
+        document.querySelectorAll("summary").forEach(summary => {
+          const text = summary.textContent.trim().replace(/\s+/g, " ");
+          const help = summaryHelp[text];
+          if (!help || summary.querySelector(".info-icon")) return;
+          summary.appendChild(createInfoIcon(help, "summary-info"));
+        });
+      }
+
+      function addChecklistTooltips() {
+        document.querySelectorAll("#sellerChecklist .check-row label").forEach(label => {
+          const text = label.childNodes[0]?.textContent?.trim() || label.textContent.trim();
+          const help = checklistHelp[text];
+          if (!help || label.querySelector(".info-icon")) return;
+          label.appendChild(createInfoIcon(help));
+        });
+      }
+
+      function applyAllTooltips() {
+        addFieldTooltips();
+        addButtonTooltips();
+        addSummaryTooltips();
+        addChecklistTooltips();
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        applyAllTooltips();
+
+        const checklist = document.getElementById("sellerChecklist");
+        if (checklist) {
+          const observer = new MutationObserver(() => addChecklistTooltips());
+          observer.observe(checklist, { childList: true, subtree: true });
+        }
+      });
     })();
   </script>
 
