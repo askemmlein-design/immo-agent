@@ -464,9 +464,10 @@
     .info-icon::after {
       content: attr(data-info);
       position: absolute;
-      left: 50%;
+      left: 0;
+      right: auto;
       bottom: calc(100% + 10px);
-      transform: translateX(-50%);
+      transform: none;
       width: min(320px, 78vw);
       padding: 10px 12px;
       border-radius: 10px;
@@ -487,9 +488,10 @@
     .info-icon::before {
       content: "";
       position: absolute;
-      left: 50%;
+      left: 4px;
+      right: auto;
       bottom: calc(100% + 4px);
-      transform: translateX(-50%);
+      transform: none;
       border: 6px solid transparent;
       border-top-color: #111827;
       opacity: 0;
@@ -504,6 +506,29 @@
     .info-icon:focus::before {
       opacity: 1;
     }
+
+    .info-icon.tooltip-align-right::after {
+      left: auto;
+      right: 0;
+    }
+
+    .info-icon.tooltip-align-right::before {
+      left: auto;
+      right: 4px;
+    }
+
+    .info-icon.tooltip-below::after {
+      bottom: auto;
+      top: calc(100% + 10px);
+    }
+
+    .info-icon.tooltip-below::before {
+      bottom: auto;
+      top: calc(100% + 4px);
+      border-top-color: transparent;
+      border-bottom-color: #111827;
+    }
+
 
     .button-info-wrap {
       display: inline-flex;
@@ -2520,8 +2545,38 @@
         addChecklistTooltips();
       }
 
+
+      function positionTooltip(icon) {
+        icon.classList.remove("tooltip-align-right", "tooltip-below");
+
+        const rect = icon.getBoundingClientRect();
+        const estimatedWidth = Math.min(320, window.innerWidth * 0.78);
+
+        if (rect.left + estimatedWidth > window.innerWidth - 16) {
+          icon.classList.add("tooltip-align-right");
+        }
+
+        if (rect.top < 150) {
+          icon.classList.add("tooltip-below");
+        }
+      }
+
+      function enableSmartTooltipPositioning() {
+        document.addEventListener("mouseenter", event => {
+          const icon = event.target.closest?.(".info-icon");
+          if (icon) positionTooltip(icon);
+        }, true);
+
+        document.addEventListener("focusin", event => {
+          const icon = event.target.closest?.(".info-icon");
+          if (icon) positionTooltip(icon);
+        });
+      }
+
+
       document.addEventListener("DOMContentLoaded", () => {
         applyAllTooltips();
+        enableSmartTooltipPositioning();
 
         const checklist = document.getElementById("sellerChecklist");
         if (checklist) {
