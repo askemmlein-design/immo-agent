@@ -760,7 +760,7 @@
       <div class="button-row">
         <button onclick="calculateOwnerOccupier()">Bewertung berechnen</button>
         <button class="secondary-button" onclick="saveOwnerOccupier()">Bewertung speichern</button>
-        <button class="orange-button" onclick="resetOwnerOccupier()">Gespeicherte Werte löschen</button>
+        <button class="orange-button" onclick="startNewProperty()">Neue Immobilie</button>
       </div>
 
       <div id="ownerOccupierResult"></div>
@@ -782,6 +782,7 @@
 
 
     <section class="card" id="objectArchiveSection">
+      <input type="hidden" id="currentObjectId" value="">
       <details id="objectArchiveDetails">
         <summary style="font-size: 1.5em; font-weight: bold;">
           📁 Objektakte & meine Immobilien
@@ -823,7 +824,9 @@
       <textarea id="objectNotes" class="small-input" placeholder="z. B. Wohnfläche klären, Heizung prüfen, Verkäufertermin am ..."></textarea>
 
       <div class="object-toolbar">
-        <button class="success-button" onclick="saveCurrentProperty()">Aktuelles Objekt speichern</button>
+        <button class="success-button" onclick="saveCurrentProperty()">Als neues Objekt speichern</button>
+        <button class="secondary-button" onclick="updateCurrentProperty()">Geladenes Objekt aktualisieren</button>
+        <button class="orange-button" onclick="startNewProperty()">Neue Immobilie</button>
         <button class="secondary-button" onclick="renderSavedProperties()">Liste aktualisieren</button>
         <button class="orange-button" onclick="showPropertyComparison()">Ausgewählte vergleichen</button>
       </div>
@@ -1950,6 +1953,312 @@
       }
 
       document.addEventListener("DOMContentLoaded", renderSavedProperties);
+    })();
+  </script>
+
+
+  <script>
+    (() => {
+      "use strict";
+
+      const PROPERTY_STORAGE_KEY = "immoAgentPropertiesV1";
+      const GLOBAL_CHECKLIST_KEY = "immoAgentVerkaeuferChecklisteV1";
+
+      const objectSpecificFields = [
+        "eoPurchasePrice", "eoArea", "eoHouseFee", "eoBuildYear",
+        "eoTargetPriceMin", "eoTargetPriceMax", "objectTitle",
+        "objectAddress", "objectStatus", "objectLink", "objectNotes",
+        "exposeText", "propertyLink"
+      ];
+
+      function readProperties() {
+        try {
+          const items = JSON.parse(localStorage.getItem(PROPERTY_STORAGE_KEY) || "[]");
+          return Array.isArray(items) ? items : [];
+        } catch {
+          return [];
+        }
+      }
+
+      function writeProperties(items) {
+        localStorage.setItem(PROPERTY_STORAGE_KEY, JSON.stringify(items));
+      }
+
+      function textValue(id) {
+        return document.getElementById(id)?.value || "";
+      }
+
+      function numberValue(id) {
+        const value = Number(String(textValue(id)).replace(",", "."));
+        return Number.isFinite(value) ? value : 0;
+      }
+
+      function readChecklistFromUi() {
+        const rows = Array.from(document.querySelectorAll("#sellerChecklist .check-row"));
+        return {
+          items: rows.map((_, index) => ({
+            checked: document.getElementById(`check-${index}`)?.checked || false,
+            status: document.getElementById(`status-${index}`)?.value || "offen"
+          })),
+          notes: document.getElementById("sellerNotes")?.value || ""
+        };
+      }
+
+      function applyChecklistToUi(state = {}) {
+        const rows = Array.from(document.querySelectorAll("#sellerChecklist .check-row"));
+
+        rows.forEach((_, index) => {
+          const item = state.items?.[index] || {};
+          const checkbox = document.getElementById(`check-${index}`);
+          const status = document.getElementById(`status-${index}`);
+
+          if (checkbox) checkbox.checked = !!item.checked;
+          if (status) status.value = item.status || "offen";
+        });
+
+        const notes = document.getElementById("sellerNotes");
+        if (notes) notes.value = state.notes || "";
+      }
+
+      function clearChecklistUi() {
+        applyChecklistToUi({ items: [], notes: "" });
+      }
+
+      function currentId() {
+        return document.getElementById("currentObjectId")?.value || "";
+      }
+
+      function setCurrentId(id) {
+        const field = document.getElementById("currentObjectId");
+        if (field) field.value = id || "";
+      }
+
+      function calculateSnapshot() {
+        const purchasePrice = numberValue("eoPurchasePrice");
+        const area = numberValue("eoArea");
+        const houseFee = numberValue("eoHouseFee");
+        const currentWarmRent = numberValue("eoCurrentWarmRent");
+        const cashEquity = numberValue("eoCashEquity");
+        const apartmentValue = numberValue("eoApartmentValue");
+        const interest = numberValue("eoInterest");
+        const repayment = numberValue("eoRepayment");
+        const reserve = numberValue("eoReserve");
+        const taxRate = numberValue("eoTaxRate");
+        const brokerRate = numberValue("eoBrokerRate");
+        const notaryRate = numberValue("eoNotaryRate");
+        const buildYear = numberValue("eoBuildYear");
+        const targetMin = numberValue("eoTargetPriceMin");
+        const targetMax = numberValue("eoTargetPriceMax");
+
+        const ancillaryCosts = purchasePrice * ((taxRate + brokerRate + notaryRate) / 100);
+        const totalCost = purchasePrice + ancillaryCosts;
+        const loan = Math.max(0, totalCost - cashEquity);
+        const monthlyLoanPayment = loan * ((interest + repayment) / 100) / 12;
+        const totalMonthly = monthlyLoanPayment + houseFee + reserve;
+        const monthlyDifference = totalMonthly - currentWarmRent;
+        const pricePerSqm = area > 0 ? purchasePrice / area : 0;
+        const cashAfterCosts = cashEquity - ancillaryCosts;
+
+        let score = 50;
+        const ratio = totalMonthly / Math.max(currentWarmRent, 1);
+
+        if (ratio <= 1.02) score += 18;
+        else if (ratio <= 1.10) score += 12;
+        else if (ratio <= 1.20) score += 5;
+        else score -= 8;
+
+        if (apartmentValue >= 120000) score += 12;
+        else if (apartmentValue >= 70000) score += 7;
+
+        if (cashAfterCosts >= 15000) score += 10;
+        else if (cashAfterCosts >= 5000) score += 4;
+        else score -= 8;
+
+        if (repayment >= 2.5) score += 8;
+        else if (repayment >= 2.0) score += 4;
+        else score -= 8;
+
+        if (buildYear && buildYear < 1970) score -= 5;
+
+        if (targetMax > 0 && purchasePrice <= targetMax) score += 7;
+        else if (targetMax > 0 && purchasePrice <= targetMax + 10000) score += 2;
+        else if (targetMax > 0) score -= 4;
+
+        score = Math.max(0, Math.min(100, Math.round(score)));
+
+        return {
+          purchasePrice, area, houseFee, currentWarmRent, cashEquity,
+          apartmentValue, interest, repayment, reserve, taxRate,
+          brokerRate, notaryRate, buildYear, targetMin, targetMax,
+          ancillaryCosts, totalCost, loan, monthlyLoanPayment,
+          totalMonthly, monthlyDifference, pricePerSqm, score
+        };
+      }
+
+      function buildPropertyPayload(existingId = "") {
+        return {
+          id: existingId || (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())),
+          title: textValue("objectTitle").trim() || "Unbenannte Immobilie",
+          address: textValue("objectAddress").trim(),
+          status: textValue("objectStatus") || "neu",
+          link: textValue("objectLink").trim(),
+          notes: textValue("objectNotes").trim(),
+          exposeText: textValue("exposeText"),
+          checklist: readChecklistFromUi(),
+          favorite: textValue("objectStatus") === "favorit",
+          selected: false,
+          updatedAt: new Date().toISOString(),
+          ...calculateSnapshot()
+        };
+      }
+
+      window.startNewProperty = function () {
+        objectSpecificFields.forEach(id => {
+          const element = document.getElementById(id);
+          if (!element) return;
+
+          if (element.tagName === "SELECT") {
+            if (id === "objectStatus") element.value = "neu";
+          } else {
+            element.value = "";
+          }
+        });
+
+        setCurrentId("");
+        clearChecklistUi();
+
+        const result = document.getElementById("ownerOccupierResult");
+        if (result) result.innerHTML = "";
+
+        const textResult = document.getElementById("textResult");
+        if (textResult) textResult.innerHTML = "";
+
+        document.getElementById("objectArchiveDetails")?.setAttribute("open", "");
+        document.getElementById("objectTitle")?.focus();
+      };
+
+      window.saveCurrentProperty = function () {
+        const property = buildPropertyPayload();
+        property.createdAt = new Date().toISOString();
+
+        const properties = readProperties();
+        properties.unshift(property);
+        writeProperties(properties);
+
+        setCurrentId(property.id);
+
+        if (typeof window.renderSavedProperties === "function") {
+          window.renderSavedProperties();
+        }
+
+        alert("Objekt wurde als neue Objektakte gespeichert.");
+      };
+
+      window.updateCurrentProperty = function () {
+        const id = currentId();
+
+        if (!id) {
+          alert("Bitte zuerst ein gespeichertes Objekt über „Laden“ öffnen.");
+          return;
+        }
+
+        const properties = readProperties();
+        const index = properties.findIndex(item => item.id === id);
+
+        if (index === -1) {
+          alert("Das geladene Objekt wurde nicht gefunden.");
+          return;
+        }
+
+        const updated = buildPropertyPayload(id);
+        updated.createdAt = properties[index].createdAt || new Date().toISOString();
+        updated.selected = properties[index].selected || false;
+
+        properties[index] = updated;
+        writeProperties(properties);
+
+        if (typeof window.renderSavedProperties === "function") {
+          window.renderSavedProperties();
+        }
+
+        alert("Das geladene Objekt wurde aktualisiert.");
+      };
+
+      const oldLoadProperty = window.loadPropertyIntoForm;
+
+      window.loadPropertyIntoForm = function (id) {
+        const item = readProperties().find(property => property.id === id);
+
+        if (!item) {
+          if (typeof oldLoadProperty === "function") oldLoadProperty(id);
+          return;
+        }
+
+        const mapping = {
+          eoPurchasePrice: item.purchasePrice,
+          eoArea: item.area,
+          eoHouseFee: item.houseFee,
+          eoCurrentWarmRent: item.currentWarmRent,
+          eoCashEquity: item.cashEquity,
+          eoApartmentValue: item.apartmentValue,
+          eoInterest: item.interest,
+          eoRepayment: item.repayment,
+          eoReserve: item.reserve,
+          eoTaxRate: item.taxRate,
+          eoBrokerRate: item.brokerRate,
+          eoNotaryRate: item.notaryRate,
+          eoBuildYear: item.buildYear,
+          eoTargetPriceMin: item.targetMin,
+          eoTargetPriceMax: item.targetMax,
+          objectTitle: item.title,
+          objectAddress: item.address,
+          objectStatus: item.status,
+          objectLink: item.link,
+          objectNotes: item.notes,
+          exposeText: item.exposeText || ""
+        };
+
+        Object.entries(mapping).forEach(([fieldId, value]) => {
+          const element = document.getElementById(fieldId);
+          if (element && value !== undefined && value !== null) {
+            element.value = value;
+          }
+        });
+
+        setCurrentId(item.id);
+        applyChecklistToUi(item.checklist || {});
+
+        if (typeof window.calculateOwnerOccupier === "function") {
+          window.calculateOwnerOccupier();
+        }
+
+        document.getElementById("objectArchiveDetails")?.setAttribute("open", "");
+      };
+
+      window.saveChecklist = function () {
+        const id = currentId();
+
+        if (!id) {
+          alert("Bitte das Objekt zuerst speichern. Danach wird die Checkliste dieser Objektakte zugeordnet.");
+          return;
+        }
+
+        const properties = readProperties();
+        const item = properties.find(property => property.id === id);
+
+        if (!item) {
+          alert("Die aktuelle Objektakte wurde nicht gefunden.");
+          return;
+        }
+
+        item.checklist = readChecklistFromUi();
+        item.updatedAt = new Date().toISOString();
+
+        writeProperties(properties);
+        localStorage.removeItem(GLOBAL_CHECKLIST_KEY);
+
+        alert("Die Verkäufer-Checkliste wurde für dieses Objekt gespeichert.");
+      };
     })();
   </script>
 
