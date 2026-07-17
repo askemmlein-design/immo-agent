@@ -662,9 +662,13 @@
     </section>
 
     <section class="card">
-      <h2>🏡 Eigennutzer-Analyse</h2>
+      <details id="ownerOccupierDetails" open>
+        <summary style="font-size: 1.5em; font-weight: bold;">
+          🏡 Eigennutzer-Analyse
+        </summary>
 
-      <p class="hint">
+        <div style="margin-top: 16px;">
+          <p class="hint">
         Persönliche Bewertung für eure Wohnungssuche. Die Werte werden lokal im Browser gespeichert.
       </p>
 
@@ -776,6 +780,8 @@
         <div class="button-row">
           <button class="secondary-button" onclick="saveChecklist()">Checkliste speichern</button>
           <button onclick="window.print()">Checkliste und Bewertung drucken</button>
+        </div>
+      </details>
         </div>
       </details>
     </section>
