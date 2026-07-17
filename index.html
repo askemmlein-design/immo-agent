@@ -492,9 +492,13 @@
     </p>
 
     <section class="card">
-      <h2>🔍 Immobilien suchen</h2>
+      <details id="searchDetails" open>
+        <summary style="font-size: 1.5em; font-weight: bold;">
+          🔍 Immobilien suchen
+        </summary>
 
-      <p class="hint">
+        <div style="margin-top: 16px;">
+          <p class="hint">
         Wähle Objektart, Maximalpreis und Radius. Die Bewertung erfolgt aktuell über deine Testdaten-API.
       </p>
 
@@ -543,6 +547,8 @@
       <button onclick="searchProperties()">
         Immobilien suchen und bewerten
       </button>
+        </div>
+      </details>
     </section>
 
     <section class="card">
@@ -604,24 +610,28 @@
         <div id="textResult"></div>
       </details>
 
-      <h3>Bewertungsart</h3>
+      <details id="ratingTypeDetails" open>
+        <summary style="font-size: 1.2em; font-weight: bold;">
+          ⚖️ Bewertungsart
+        </summary>
 
-      <div class="grid grid-2">
-        <div>
-          <label for="usage">Nutzung</label>
-          <select id="usage">
-            <option value="kapitalanlage">Kapitalanlage / Vermietung</option>
-            <option value="eigennutzung" selected>Eigennutzung</option>
-          </select>
+        <div style="margin-top: 14px;">
+          <div class="grid grid-2">
+            <div>
+              <label for="usage">Nutzung</label>
+              <select id="usage">
+                <option value="kapitalanlage">Kapitalanlage / Vermietung</option>
+                <option value="eigennutzung" selected>Eigennutzung</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="rentPerSqm">Ortsübliche Miete €/m²</label>
+              <input id="rentPerSqm" type="number" value="15" step="0.5">
+            </div>
+          </div>
         </div>
-
-        <div>
-          <label for="rentPerSqm">Ortsübliche Miete €/m²</label>
-          <input id="rentPerSqm" type="number" value="15" step="0.5">
-        </div>
-      </div>
-
-      <br />
+      </details>
 
       <details>
         <summary>🏦 Finanzierung anpassen</summary>
@@ -845,9 +855,13 @@
 
 
     <section class="card">
-      <h2>📊 Ergebnisse</h2>
+      <details id="resultsDetails">
+        <summary style="font-size: 1.5em; font-weight: bold;">
+          📊 Ergebnisse
+        </summary>
 
-      <div id="results">
+        <div style="margin-top: 16px;">
+          <div id="results">
         <div class="result-card">
           <h3>Beispielbewertung</h3>
 
@@ -871,7 +885,9 @@
 
           <p><strong>Empfehlung:</strong> Genau prüfen</p>
         </div>
-      </div>
+          </div>
+        </div>
+      </details>
     </section>
   </div>
 
